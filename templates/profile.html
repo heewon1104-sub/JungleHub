@@ -44,6 +44,26 @@
             color: #28a745;
         }
     </style>
+    <script>
+         async function liekModifi() {
+            // 디비에 접근햐여 자기소개 수정하기
+            // 서버에 데이터 전송
+            const response = await fetch('/profile/like', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                // 저장 성공 시 프로필 페이지로 이동
+                window.location.href = '/profile';
+            } else {
+                alert('좋아요 실패했습니다.');
+            }
+
+            }
+    </script>
 </head>
 <body>
 
@@ -51,6 +71,7 @@
         <img src="https://i.ibb.co/dLQ2Pw1/logoyogo-1-9.jpg" alt="Profile Picture" class="profile-pic">
         <div class="profile-info">기수: 7기 | 번호: 16번</div>
         <div class="profile-name">홍길동</div>
+        <div>{{like}}<button class="btn" onclick="liekModifi()">좋아요</button></div>
         <div class="profile-github">
             <a href="https://github.com/username" target="_blank">GitHub Profile</a>
         </div>
