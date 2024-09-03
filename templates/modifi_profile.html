@@ -47,7 +47,6 @@
     <script>
          async function postModifi() {
             // 디비에 접근햐여 자기소개 수정하기
-
             const bio = document.querySelector('.profile-bio').value;
             // 서버에 데이터 전송
             const response = await fetch('/profile/save', {
