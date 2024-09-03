@@ -1,5 +1,5 @@
 <!-- templates/header.html -->
-<header class="bg-black text-white pt-5 py-5 border-gray-500" style="border-bottom-width: 1px;">
+<header class="bg-black text-white pt-5 py-5 border-gray-500" style="border-bottom-width: 1px; width: 100%;">
     <div class="container mx-auto flex justify-between items-center px-4">
         <!-- Logo -->
         <div class="flex items-center">
@@ -7,15 +7,14 @@
             <img href="#" src="{{ url_for('static', filename='images/Logo.png') }}" alt="JungleHub Logo"
                 class="h-12 w-12 mr-2">
             <!-- 폰트 크기와 굵기를 키움: text-2xl -->
-            <span href="#" class="text-green-500 text-2xl font-bold">JungleHub</span>
+            <a href="/main" class="text-green-500 text-2xl font-bold">JungleHub</a>
         </div>
         <!-- Login/Signup -->
         <div>
             <!-- 로그인/회원가입 폰트 크기를 키움: text-lg -->
-            <a href="#" class="text-green-500 hover:underline font-bold text-lg">로그인</a>
+            <a href="/login" class="text-green-500 hover:underline font-bold text-lg">로그인</a>
             <span class="mx-2">|</span>
-            <a href="{{ url_for('signup.signup') }}" class="text-green-500 hover:underline font-bold text-lg">회원가입</a>
-            
+            <a href="#" class="text-green-500 hover:underline font-bold text-lg">회원가입</a>
         </div>
     </div>
 </header>
