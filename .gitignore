@@ -10,4 +10,4 @@ htmlcov/
 docs/_build/
 
 # auth
-keys.xml
+configuration/config.xml
