@@ -15,7 +15,7 @@ from configuration.config import Config
 
 config = Config()
 
-clientId = config.find("MONGODB_ID").text
-clientKey = config.find("MONGODB_SECRET").text
+clientId = config.find("MONGODB_ID")
+clientKey = config.find("MONGODB_SECRET")
 
 '''
