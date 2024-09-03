@@ -45,9 +45,9 @@
         }
     </style>
     <script>
-         async function postMidifi() {
+         async function postModifi() {
             // 디비에 접근햐여 자기소개 수정하기
-            
+
             const bio = document.querySelector('.profile-bio').value;
             // 서버에 데이터 전송
             const response = await fetch('/profile/save', {
@@ -74,12 +74,13 @@
         <img src="https://i.ibb.co/dLQ2Pw1/logoyogo-1-9.jpg" alt="Profile Picture" class="profile-pic">
         <div class="profile-info">기수: 7기 | 번호: 16번</div>
         <div class="profile-name">홍길동</div>
+        <div>{{like}}</div>
         <div class="profile-github">
             <a href="https://github.com/username" target="_blank">GitHub Profile</a>
         </div>
         <textarea name="bio" class="profile-bio">{{ bio }}</textarea >
         <div class="profile-contributions">누적 기여 수: 120</div>
-        <button  type="submit" class="btn btn-primary" onclick="postMidifi()" >저장하기</button>
+        <button  type="submit" class="btn btn-primary" onclick="postModifi()" >저장하기</button>
     </div>
 
 </body>
