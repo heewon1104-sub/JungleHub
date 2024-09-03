@@ -45,21 +45,23 @@
         }
     </style>
     <script>
-         async function liekModifi() {
+         async function postModifi() {
             // 디비에 접근햐여 자기소개 수정하기
+            const bio = document.querySelector('.profile-bio').value;
             // 서버에 데이터 전송
-            const response = await fetch('/profile/like', {
+            const response = await fetch('/profile/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ bio: bio }),
             });
 
             if (response.ok) {
                 // 저장 성공 시 프로필 페이지로 이동
                 window.location.href = '/profile';
             } else {
-                alert('좋아요 실패했습니다.');
+                alert('자기소개를 저장하는 데 실패했습니다.');
             }
 
             }
@@ -71,13 +73,13 @@
         <img src="https://i.ibb.co/dLQ2Pw1/logoyogo-1-9.jpg" alt="Profile Picture" class="profile-pic">
         <div class="profile-info">기수: 7기 | 번호: 16번</div>
         <div class="profile-name">홍길동</div>
-        <div>{{like}}<button class="btn" onclick="liekModifi()">좋아요</button></div>
+        <div>{{like}}</div>
         <div class="profile-github">
             <a href="https://github.com/username" target="_blank">GitHub Profile</a>
         </div>
-        <div class="profile-bio">{{ bio }}</div>
+        <textarea name="bio" class="profile-bio">{{ bio }}</textarea >
         <div class="profile-contributions">누적 기여 수: 120</div>
-        <button class="btn" onclick="window.location.href='/profile/modifi'">수정하기</button>
+        <button  type="submit" class="btn btn-primary" onclick="postModifi()" >저장하기</button>
     </div>
 
 </body>

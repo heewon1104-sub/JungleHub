@@ -3,10 +3,10 @@ from controller import main, login, user_profile
 
 app = Flask(__name__)
 
+# 블루프린트 등록 
 app.register_blueprint(main.bp)
 app.register_blueprint(login.bp)
 app.register_blueprint(user_profile.bp)
-
 # TODO: sign_up
 
 if __name__ == '__main__':
