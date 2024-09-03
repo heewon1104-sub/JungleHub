@@ -13,7 +13,11 @@ def signup():
 def signupUpdate():
     id = request.form['id'],
     password = request.form['password']
+    passwordconfirm = request.form['password-confirm']
+    cardinal = request.form['cardinal']
+    number = request.form['number']
     intro = request.form['intro']
+
     githubLoginUrl = githubApi.getLoginUrl()
     return redirect(githubLoginUrl)
 
@@ -23,6 +27,8 @@ def signupComplete():
     code = request.args.get('code')
     
     accessToken = githubApi.getAccessToken(code)
+
+    print(accessToken)
 
     # TODO: 회원가입 처리!
     

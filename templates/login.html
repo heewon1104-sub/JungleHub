@@ -1,13 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>JungleHub Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
 
-    login
-    
+<body class="bg-black flex flex-col items-center justify-center min-h-screen">
+    {% include 'header.html' %}
+
+    <!-- Login Form Container -->
+    <div class="bg-black border-2 border-green-500 rounded-lg p-8 max-w-md w-full"
+        style="margin-top: 100px; margin-bottom: 100px; padding: 50px;">
+        <!-- Logo and Title -->
+        <div class="flex flex-col items-center mb-6">
+            <img src="../static/images/Logo.png" alt="JungleHub Logo" class="h-20 w-20 mb-2">
+            <!-- Increase logo size -->
+            <span class="text-green-500 text-4xl font-bold">JungleHub</span> <!-- Increase text size -->
+        </div>
+
+        <!-- Form Inputs -->
+        <div class="space-y-6"> <!-- Increase space between inputs -->
+            <!-- ID Input -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 12a4 4 0 01-8 0 4 4 0 018 0zm-8 0v1m4-1v1m-6 5h6m6-5v1m0 4v1m-10 4H4v-4m0-4h2m0 4h8m-8 4h8m0 0H4m8-8h8">
+                        </path>
+                    </svg>
+                </span>
+                <input type="text" placeholder="아이디"
+                    class="w-full py-3 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <!-- Increase padding for inputs -->
+            </div>
+
+            <!-- Password Input -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zm0 0v2m4-2v2m-4 4v2m6 2H6m6 0H6">
+                        </path>
+                    </svg>
+                </span>
+                <input type="password" placeholder="비밀번호"
+                    class="w-full py-3 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <!-- Increase padding for inputs -->
+            </div>
+        </div>
+
+        <!-- Login Button -->
+        <div class="mt-8">
+            <button class="w-full py-3 bg-green-500 text-white rounded-full font-bold hover:bg-green-600">로그인</button>
+            <!-- Increase button size -->
+        </div>
+
+        <!-- Signup Link -->
+        <div class="mt-4">
+            <button class="w-full py-3 bg-green-500 text-white rounded-full font-bold hover:bg-green-600">회원가입</button>
+            <!-- Increase button size -->
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
 </body>
+
 </html>
