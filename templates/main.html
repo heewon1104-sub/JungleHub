@@ -27,6 +27,7 @@
 
                 <!-- JavaScript를 사용하여 35개의 타일을 동적으로 생성합니다. -->
                 <script>
+
                     // 전역 변수로 선언하여 화면 너비의 50% 값을 저장
                     var screenWidth80Percent = window.innerWidth * 0.5;
 
@@ -101,6 +102,13 @@
                     // 페이지 로드 시 DAY 계산 및 업데이트
                     window.onload = function () {
                         document.getElementById('day-display').innerText = calculateDay();
+
+                        a = '{{ clientInfo }}'
+
+                        console.log(a)
+
+                        // TODO: 부탁드립니다.
+
                     };
                 </script>
             </div>

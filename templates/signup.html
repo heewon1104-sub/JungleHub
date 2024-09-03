@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <form action="{{ url_for('signup.signupUpdate') }}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="form-group">
+                <input id="id" placeholder="아이디를 입력하세요" name="id">
+            </div>
+            <div class="form-group">
+                <input id="password" placeholder="비밀번호를 입력하세요" name="password" type="password">
+            </div>
+            <div class="form-group">
+                <textarea id="password" placeholder="자기소개를 해주세요!" name="intro"></textarea>
+            </div>
+            <button type="submit">저장하기</button>
+        </form> 
+    </div>
+
+    <script>
+
+        function validateForm() {
+            let title = $("#id").val()
+            let content = $('#password').val()
+            if (validate(title, content)) {
+                return true
+            } else {
+                location.reload()
+                return false
+            }
+        }
+
+        function validate(title, content) {
+            if (title === "") {
+                alert("제목을 입력해주세요!")
+                return false
+            }
+            if (content === "") {
+                alert("내용을 입력해주세요!")
+                return false
+            }
+            return true
+        }
+
+    </script>
+</body>
+</html>
