@@ -45,9 +45,10 @@
         }
     </style>
     <script>
-         async function liekModifi() {
+         async function likeModifi() {
             // 디비에 접근햐여 자기소개 수정하기
             // 서버에 데이터 전송
+            try {
             const response = await fetch('/profile/like', {
                 method: 'POST',
                 headers: {
@@ -56,27 +57,31 @@
             });
 
             if (response.ok) {
-                // 저장 성공 시 프로필 페이지로 이동
-                window.location.href = '/profile';
+                const result = await response.json();
+                // 서버에서 반환된 새로운 like 값으로 업데이트
+                document.querySelector('.like-count').innerText = result.like;
             } else {
                 alert('좋아요 실패했습니다.');
             }
-
-            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('서버와의 통신 중 오류가 발생했습니다.');
+        }
+    }
     </script>
 </head>
 <body>
 
-    <div class="profile-container">
-        <img src="https://i.ibb.co/dLQ2Pw1/logoyogo-1-9.jpg" alt="Profile Picture" class="profile-pic">
-        <div class="profile-info">기수: 7기 | 번호: 16번</div>
-        <div class="profile-name">홍길동</div>
-        <div>{{like}}<button class="btn" onclick="liekModifi()">좋아요</button></div>
+     <div class="profile-container">
+        <img src="{{ pic_url }}" alt="Profile Picture" class="profile-pic">
+        <div class="profile-info">기수: {{ generation }}기 | 번호: {{ num }}번</div>
+        <div class="profile-name">{{ name }}</div>
+        <div><span class="like-count">{{ like }}</span> <button class="btn" onclick="likeModifi()">좋아요</button></div>
         <div class="profile-github">
-            <a href="https://github.com/username" target="_blank">GitHub Profile</a>
+            <a href="{{ git }}" target="_blank">GitHub Profile</a>
         </div>
         <div class="profile-bio">{{ bio }}</div>
-        <div class="profile-contributions">누적 기여 수: 120</div>
+        <div class="profile-contributions">누적 기여 수: {{ commit }}</div>
         <button class="btn" onclick="window.location.href='/profile/modifi'">수정하기</button>
     </div>
 
