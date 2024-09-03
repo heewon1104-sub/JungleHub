@@ -3,6 +3,8 @@ from controller import main, login, user_profile, signup
 
 app = Flask(__name__)
 
+app.secret_key = '4e68e4301a5d8473b81858461e61f9f6'
+
 # 블루프린트 등록 
 app.register_blueprint(main.bp)
 app.register_blueprint(login.bp)
