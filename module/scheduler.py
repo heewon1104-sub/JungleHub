@@ -10,6 +10,7 @@ class Scheduler:
         self._scheduler.add_job(job, 'interval', seconds=seconds)
         self._scheduler.start()
 
+
 ''' 사용 예시
 
 scheduler = Scheduler()
