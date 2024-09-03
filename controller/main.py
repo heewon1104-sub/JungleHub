@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, session
 
 bp = Blueprint('main', __name__)
 
@@ -8,4 +8,5 @@ def root():
 
 @bp.route("/main")
 def main():
-    return render_template('main.html')
+    clientInfo = session.get('clientInfo')
+    return render_template('main.html', clientInfo = clientInfo)

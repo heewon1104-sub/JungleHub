@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect
+from flask import Blueprint, render_template, request, jsonify, redirect, session
 from module.githubApi import GithubApi
 
 bp = Blueprint('signup', __name__)
@@ -19,12 +19,23 @@ def signupUpdate():
 
 @bp.route("/signup/complete", methods=["GET"])
 def signupComplete():
-    print("complete로 들어오긴 했다. 🍎")
+    
     code = request.args.get('code')
+    
     accessToken = githubApi.getAccessToken(code)
-    print(code, accessToken)
 
-    # TODO: 이걸로 로그인 처리!
+    # TODO: 회원가입 처리!
+    
+    # 회원 create 
+    # github access token도 함께 저장
+    
+    # JWT 만들기 - 뭐 들어갈지도 정해야 함. 
+    # JWT를 clientInfo의 access_token에 할당
 
-    return redirect('/')
+    clientInfo = {
+        'access_token': 'access 토큰 입니다.'
+    }
 
+    session['clientInfo'] = clientInfo
+
+    return redirect('/main')
