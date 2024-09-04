@@ -141,9 +141,7 @@ function formatDate(date) {
 async function initializeTiles() {
   try {
     // 서버로부터 숨길 타일 인덱스를 가져옴
-    const response = await fetch(
-      'http://127.0.0.1:8000/commit/board/open/list'
-    );
+    const response = await fetch('/commit/board/open/list');
     const data = await response.json();
     list = data.indices; // 서버에서 받은 인덱스를 list에 저장
 
