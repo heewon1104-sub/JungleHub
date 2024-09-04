@@ -1,5 +1,5 @@
 from repository.repositoryConfig import client, RepositoryConfig
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from model.dayTotalCommitCount import DayTotalCommitCount
 
 class DayTotalCommitCountRepository: 
@@ -24,7 +24,7 @@ class DayTotalCommitCountRepository:
         return list;
 
     def todayCount(self):
-        current = datetime.now(timezone.utc)
+        current = datetime.now(timezone(timedelta(hours=9-6)))
         year = current.year
         month = current.month
         day = current.day

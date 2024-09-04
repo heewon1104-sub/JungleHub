@@ -4,8 +4,8 @@ from flask_cors import CORS
 
 from batch.CommitCountScheduler import CommitCountScheduler
 
-# CommitCountScheduler().run()
-CommitCountScheduler().job()
+CommitCountScheduler().run()
+# CommitCountScheduler().job()
 
 app = Flask(__name__)
 
