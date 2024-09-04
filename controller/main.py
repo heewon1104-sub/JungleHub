@@ -14,10 +14,7 @@ def main():
     clientInfo = inMemoryCacheInstance.get(code)
     inMemoryCacheInstance.delete(code)
 
-    print("💩")
-    print(clientInfo)
-
     if clientInfo is not None: 
-        return render_template('main.html', clientInfo = clientInfo)
+        return render_template('main.html', clientInfo=clientInfo)
     else:
         return render_template('main.html')
