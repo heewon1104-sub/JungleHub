@@ -143,10 +143,16 @@ class ProfileRepository:
             return data['git']
         return None
     
+    def read_git_user(self, git):
+        data = self.collection.find_one({ 'git': git })
+        if data:
+            return data
+        return None
+    
     def read_github_access_token(self, accessToken):
         data = self.collection.find_one({ 'githubaccesstoken': accessToken })
         if data:
-            return data['githubaccesstoken']
+            return data
         return None
     
 
@@ -170,6 +176,16 @@ class ProfileRepository:
         )
         if result:
             return result['bio']
+        return None
+    
+    def update_github_access_token(self, user, newAccessToken):
+        result = self.collection.find_one_and_update(
+            {'_id': user['_id'] },
+            {'$set': { 'githubaccesstoken': newAccessToken }},
+            return_document=True
+        )
+        if result:
+            return result
         return None
     
      # 모든 유저의 정보를 삭제하는 함수

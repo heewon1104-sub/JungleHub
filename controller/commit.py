@@ -25,4 +25,11 @@ def commitTotalCount():
 
 @bp.route('/commit/board/block/list')
 def commitBlockList():
-    return
+    result = {
+        "indices": [1,5,34]
+    }
+    return jsonify(result)
+
+# @bp.route('/commit')
+# def ():
+#     return 'hello'
