@@ -35,7 +35,9 @@ class DayTotalCommitCountRepository:
             item = DayTotalCommitCount.from_dict(data)
             if item._id == key:
                 list.append(item)
-        return list;
+
+        totalCommitCount = sum([ item.count for item in list])
+        return totalCommitCount;
 
     
     def updateCount(self, _id, newCount):

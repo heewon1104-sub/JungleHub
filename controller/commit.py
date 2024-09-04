@@ -23,10 +23,6 @@ def commitTotalCount():
     }
     return jsonify(result)
 
-@bp.route('/commit/block-list')
+@bp.route('/commit/board/block/list')
 def commitBlockList():
-    return 'hello'
-
-# @bp.route('/commit')
-# def ():
-#     return 'hello'
+    return
