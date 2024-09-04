@@ -39,11 +39,10 @@ class DayTotalCommitCountRepository:
         totalCommitCount = sum([ item.count for item in list])
         return totalCommitCount;
 
-    
-    def updateCount(self, _id, newCount):
+    def update(self, newModel):
         self.collection.update_one(
-            {'_id': _id},
-            {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }},
+            {'_id': newModel._id},
+            {'$set': newModel.to_dict() },
             upsert=True
         )
 

@@ -25,7 +25,7 @@ class UserCommitCountRepository:
         return list;
 
     def todayList(self):
-        current = datetime.now(timezone(timedelta(hours=9+6)))
+        current = datetime.now(timezone(timedelta(hours=9-6)))
         year = current.year
         month = current.month
         day = current.day
@@ -68,8 +68,6 @@ class UserCommitCountRepository:
 
         if operations:
             self.collection.bulk_write(operations)
-
-
 
     def delete(self, _id):
         self.collection.delete_one(
