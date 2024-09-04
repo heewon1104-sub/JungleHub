@@ -45,7 +45,7 @@ function startFirstAnimation() {
   if (isFirstAnimationPlaying) return; // 애니메이션이 이미 진행 중이라면 중복 실행 방지
 
   isFirstAnimationPlaying = true;
-  const content = 'Github를 한눈에';
+  const content = '정글러들의 Github';
   let i = 0;
   const text = document.querySelector('#animation-text');
   text.classList.remove('hidden');
