@@ -31,6 +31,13 @@ def signupComplete():
     if code:
         accessToken = githubApi.getAccessToken(code)
 
+        # 깃허브 엑세스 토큰을 가진 유저가 존재할 경우 바로 main화면 이동
+
+        if profile_repository.read_github_access_token(accessToken) == accessToken:
+            key = hashlib.sha256(accessToken.encode()).hexdigest()
+            inMemoryCacheInstance.set(key, accessToken)
+            return redirect('f/main?code={key}')
+
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
         key = hashlib.sha256(accessToken.encode()).hexdigest()
         inMemoryCacheInstance.set(key, accessToken)
