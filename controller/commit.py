@@ -30,6 +30,7 @@ def commitTotalCount():
     }
     return jsonify(result)
 
+
 @bp.route('/commit/board/open/list')
 def commitOpenList():
     item = boardBlockListRepository.todayOpenList()
@@ -40,3 +41,4 @@ def commitOpenList():
         return jsonify(result)
     else:
         return []
+

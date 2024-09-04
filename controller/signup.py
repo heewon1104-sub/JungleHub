@@ -31,12 +31,19 @@ def signupComplete():
     if code:
         accessToken = githubApi.getAccessToken(code)
 
-        # 깃허브 엑세스 토큰을 가진 유저가 존재할 경우 바로 main화면 이동
+        githubUserInfo = githubApi.getUserInfo(githubAccessToken=accessToken)
 
-        if profile_repository.read_github_access_token(accessToken) == accessToken:
-            key = hashlib.sha256(accessToken.encode()).hexdigest()
-            inMemoryCacheInstance.set(key, accessToken)
-            return redirect('f/main?code={key}')
+        if githubUserInfo is not None:
+            git = githubUserInfo['html_url']
+            user = profile_repository.read_git_user(git)
+
+            if user['git'] == git: # 이미 회원 가입된 사람
+                result = profile_repository.update_github_access_token(user, accessToken)
+                key = hashlib.sha256(accessToken.encode()).hexdigest()
+                inMemoryCacheInstance.set(key, {
+                    "access_token": accessToken
+                })
+                return redirect(f'/main?code={key}')
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
         key = hashlib.sha256(accessToken.encode()).hexdigest()
@@ -102,7 +109,7 @@ def signupUpdate():
     )
     created_user = profile_repository.create(usertable) 
     user_id = created_user._id
-    print(f"생성된 유저의 _id: {user_id}")
+    print("생성된 유저의 _id: {user_id}")
  
     # jwt 토큰 발급
     payload = {"userId": user_id}
@@ -122,7 +129,7 @@ def signupUpdate():
         createdat = datetime.now()
     )
     created_token = token_repository.create(tokentable) 
-    print(f"생성된 유저의 userId: {created_token.userId}")    
+    print("생성된 유저의 userId: {created_token.userId}")    
 
     # count batch refresh 
     # CommitCountScheduler().job()
