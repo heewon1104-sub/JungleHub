@@ -61,21 +61,74 @@
             color: #28a745;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        window.onload = function () {
+            const token = localStorage.getItem('key');
+            console.log(token);
+
+            loadProfile();
+        }
+
+
+        function loadProfile() {
+            // 로컬 스토리지에서 accessToken 가져오기
+            const token = localStorage.getItem('key');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            // console(token)
+
+            // 서버로 GET 요청, 헤더에 토큰 포함
+            $.ajax({
+                url: '/profile/info',
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                success: function (user) {
+                    // 프로필 데이터를 페이지에 동적으로 추가
+                    $('.profile-container').html(`
+                        <img src="${user.pic_url}" alt="Profile Picture" class="profile-pic">
+                        <div class="profile-info">기수: ${user.generation}기 | 번호: ${user.num}번</div>
+                        <div class="profile-name">${user.name}</div>
+                        <div><span class="like-count">${user.like}</span> <button class="btn" onclick="likeModifi()">좋아요</button></div>
+                        <div class="profile-github">
+                            <a href="${user.git}" target="_blank">GitHub Profile</a>
+                        </div>
+                        <div class="profile-bio">${user.bio}</div>
+                        <div class="profile-contributions">누적 기여 수: ${user.commit}</div>
+                        <button class="btn" onclick="window.location.href='/profile1/modifi'">수정하기</button>
+                    `);
+                },
+                error: function (xhr, status, error) {
+                    console.error('프로필 정보를 불러오는 중 오류:', error);
+
+                }
+            });
+        }
+
         async function likeModifi() {
-            // 디비에 접근햐여 자기소개 수정하기
-            // 서버에 데이터 전송
+            const token = localStorage.getItem('key');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+
             try {
-                const response = await fetch('/profile/like', {
+                const response = await fetch('/profile1/like', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    },
+                        'Authorization': 'Bearer ' + token
+                    }
                 });
 
                 if (response.ok) {
                     const result = await response.json();
-                    // 서버에서 반환된 새로운 like 값으로 업데이트
                     document.querySelector('.like-count').innerText = result.like;
                 } else {
                     alert('좋아요 실패했습니다.');
@@ -89,19 +142,10 @@
 </head>
 
 <body>
-
     <div class="profile-container">
-        <img src="{{ pic_url }}" alt="Profile Picture" class="profile-pic">
-        <div class="profile-info">기수: {{ generation }}기 | 번호: {{ num }}번</div>
-        <div class="profile-name">{{ name }}</div>
-        <div><span class="like-count">{{ like }}</span> <button class="btn" onclick="likeModifi()">좋아요</button></div>
-        <div class="profile-github">
-            <a href="{{ git }}" target="_blank">GitHub Profile</a>
-        </div>
-        <div class="profile-bio">{{ bio }}</div>
-        <div class="profile-contributions">누적 기여 수: {{ commit }}</div>
-        <button class="btn" onclick="window.location.href='/profile/modifi'">수정하기</button>
+
     </div>
+
 
 </body>
 
