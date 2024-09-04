@@ -38,14 +38,6 @@ class CommitCountScheduler:
 
         list = map(convert, result)
 
-        # list = [
-        #     {
-        #         'userId': "wjdwoaud", # 유저 식별 값 
-        #         'loginId': 'jjm159', # 깃허브 아이디
-        #         'accessToken': 'test'
-        #     }
-        # ] * 10
-
         # userId, totalCommitCount
         resultList = self.api.getAllTotalCommitCount(list=list)
 
@@ -58,5 +50,6 @@ class CommitCountScheduler:
         userCommitCountRepository.updateAllUserCount(resultList)
 
 
+        # TODO: board block list 로직 추가
 
         

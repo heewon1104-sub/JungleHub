@@ -22,11 +22,27 @@ class DayTotalCommitCountRepository:
             item = DayTotalCommitCount.from_dict(data)
             list.append(item)
         return list;
+
+    def todayCount(self):
+        current = datetime.now(timezone.utc)
+        year = current.year
+        month = current.month
+        day = current.day
+        key = f"{year}-{month}-{day}"
+
+        list = []
+        for data in self.collection.find():
+            item = DayTotalCommitCount.from_dict(data)
+            if item._id == key:
+                list.append(item)
+        return list;
+
     
     def updateCount(self, _id, newCount):
         self.collection.update_one(
             {'_id': _id},
-            {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }}
+            {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }},
+            upsert=True
         )
 
     def delete(self, _id):

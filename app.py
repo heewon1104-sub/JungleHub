@@ -4,7 +4,7 @@ from controller import main, login, user_profile, signup, commit
 from batch.CommitCountScheduler import CommitCountScheduler
 
 # CommitCountScheduler().run()
-# CommitCountScheduler().job()
+CommitCountScheduler().job()
 
 app = Flask(__name__)
 
