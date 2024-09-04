@@ -11,7 +11,8 @@ class GithubApi:
 
     def __init__(self):
         self.graphqlUrl = "https://api.github.com/graphql"
-        self.restUrl = "https://github.com"
+        self.githubUrl = "https://github.com"
+        self.restAPIUrl = "https://api.github.com"
         config = Config()
         self.clientId = config.find("GITHUB_CLIENT_ID")
         self.clientKey = config.find("GITHUB_CLIENT_SECRET")
@@ -32,10 +33,8 @@ class GithubApi:
             "client_secret": self.clientKey,
         })
 
-        response = requests.post(self.restUrl + "/login/oauth/access_token", headers=headers, data=data)
+        response = requests.post(self.githubUrl + "/login/oauth/access_token", headers=headers, data=data)
 
-        # 결과 출력
-        print("🍎🍎🍎🍎🍎🍎🍎🍎🍎")
         if response.status_code == 200:
             resultText = response.text
             parsedQuery = parse_qs(resultText)
@@ -43,6 +42,21 @@ class GithubApi:
         else:
             print(response.text)
 
+    def getUserInfo(self, githubAccessToken, githubId):
+        headers = {
+            "Authorization": f"bearer {githubAccessToken}"
+        }
+
+        response = requests.get(self.restAPIUrl + f"/users/{githubId}", headers=headers)
+
+        if response.status_code == 200:
+            jsonResult = json.loads(response.text)
+            print(jsonResult['login'])
+            print(jsonResult['name'])
+            print(jsonResult['email'])
+            return jsonResult
+        else:
+            print(response.text)
 
     def getTotalCommitCountToday(self, loginId, accessToken):
 

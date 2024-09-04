@@ -30,7 +30,7 @@ class UserCommitCountRepository:
             {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }}
         )
 
-    def updateAllUserCount(userIdAndNewCountList):
+    def updateAllUserCount(self, userIdAndNewCountList):
         operations = []
         for key, newCount in userIdAndNewCountList:
             operations.append(
