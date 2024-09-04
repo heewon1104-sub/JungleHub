@@ -42,18 +42,15 @@ class GithubApi:
         else:
             print(response.text)
 
-    def getUserInfo(self, githubAccessToken, githubId):
+    def getUserInfo(self, githubAccessToken):
         headers = {
             "Authorization": f"bearer {githubAccessToken}"
         }
 
-        response = requests.get(self.restAPIUrl + f"/users/{githubId}", headers=headers)
+        response = requests.get(self.restAPIUrl + "/user", headers=headers)
 
         if response.status_code == 200:
             jsonResult = json.loads(response.text)
-            print(jsonResult['login'])
-            print(jsonResult['name'])
-            print(jsonResult['email'])
             return jsonResult
         else:
             print(response.text)
