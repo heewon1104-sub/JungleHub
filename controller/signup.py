@@ -29,25 +29,34 @@ def signupComplete():
     code = request.args.get('code')
     
     if code:
-        accessToken = githubApi.getAccessToken(code)
+        githubAccessToken = githubApi.getAccessToken(code)
 
-        githubUserInfo = githubApi.getUserInfo(githubAccessToken=accessToken)
+        githubUserInfo = githubApi.getUserInfo(githubAccessToken=githubAccessToken)
 
         if githubUserInfo is not None:
             git = githubUserInfo['html_url']
+
             user = profile_repository.read_git_user(git)
 
-            if user['git'] == git: # 이미 회원 가입된 사람
-                result = profile_repository.update_github_access_token(user, accessToken)
-                key = hashlib.sha256(accessToken.encode()).hexdigest()
-                inMemoryCacheInstance.set(key, {
-                    "access_token": accessToken
-                })
-                return redirect(f'/main?code={key}')
+            if user:
+                if user['git'] == git: # 이미 회원 가입된 사람
+                    profile_repository.update_github_access_token(user, githubAccessToken)
+                    userid = user['_id']
+                    
+                    token = token_repository.read_all_token(userid)
+                    if token:
+                        accessToken = token.accesstoken 
+                        key = hashlib.sha256(accessToken.encode()).hexdigest()
+                        inMemoryCacheInstance.set(key, {
+                            "access_token": accessToken
+                        })
+                        return redirect(f'/main?code={key}')
+                else: 
+                    return redirect('/main')
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
-        key = hashlib.sha256(accessToken.encode()).hexdigest()
-        inMemoryCacheInstance.set(key, accessToken)
+        key = hashlib.sha256(githubAccessToken.encode()).hexdigest()
+        inMemoryCacheInstance.set(key, githubAccessToken)
         # 이후 signup.html 페이지로 리다이렉트합니다.
         return redirect(f'/signup?code={key}')
     else:
