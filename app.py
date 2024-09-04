@@ -5,10 +5,12 @@ from flask_cors import CORS
 from batch.CommitCountScheduler import CommitCountScheduler
 
 # CommitCountScheduler().run()
-# CommitCountScheduler().job()
+CommitCountScheduler().job()
 
 app = Flask(__name__)
+
 CORS(app)
+
 # 블루프린트 등록 
 app.register_blueprint(main.bp)
 app.register_blueprint(login.bp)
