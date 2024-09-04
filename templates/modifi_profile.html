@@ -45,31 +45,31 @@
         }
     </style>
     <script>
-         async function postModifi() {
-            // 디비에 접근햐여 자기소개 수정하기
-             // 자기소개를 업데이트하는 함수
-             const bio = document.querySelector('.profile-bio').value;
+        //  async function postModifi() {
+        //     // 디비에 접근햐여 자기소개 수정하기
+        //      // 자기소개를 업데이트하는 함수
+        //      const bio = document.querySelector('.profile-bio').value;
             
-            const response = await fetch('/profile/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ bio: bio }),
-            });
+        //     const response = await fetch('/profile/save', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ bio: bio }),
+        //     });
 
-            if (response.ok) {
-                window.location.href = '/profile';
-            } else {
-                alert('저장에 실패했습니다.');
-            }
+        //     if (response.ok) {
+        //         window.location.href = '/profile';
+        //     } else {
+        //         alert('저장에 실패했습니다.');
+        //     }
 
-        }
+        // }
     </script>
 </head>
 <body>
 
-    <div class="profile-container">
+    <!-- <div class="profile-container">
         <img src="{{ pic_url }}" alt="Profile Picture" class="profile-pic">
         <div class="profile-info">기수: {{ generation }}기 | 번호: {{ num }}번</div>
         <div class="profile-name">{{ name }}</div>
@@ -80,7 +80,7 @@
         <textarea name="bio" class="profile-bio">{{ bio }}</textarea >
         <div class="profile-contributions">누적 기여 수: {{ commit }}</div>
         <button  type="submit" class="btn btn-primary" onclick="postModifi()" >저장하기</button>
-    </div>
+    </div> -->
 
 </body>
 </html>
