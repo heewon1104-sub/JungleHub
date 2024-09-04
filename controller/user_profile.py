@@ -12,6 +12,17 @@ def set_testid(tid):
 
 @bp.route('/profile')  # 프로필
 def profile():
+
+    # key = hashlib.sha256(accessToken.encode()).hexdigest()
+    # clientInfo = {
+    #     'access_token': accessToken
+    # }
+
+    code = request.args.get('code')
+    # print(code)
+    # accesstoken = 
+
+
     user_id = testid  # 실제 로그인된 유저의 ID로 대체해야 함
     user = profile_repository.read_all(user_id)
     
