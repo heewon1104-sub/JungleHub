@@ -51,9 +51,7 @@ def signup():
         
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
-
-    # TODO: 중복 검사 해야 함. 
-
+  
     code = request.args.get('code')
     github_access_token = inMemoryCacheInstance.get(code)
     print("🍎🍎" + code)
