@@ -18,7 +18,7 @@ bp = Blueprint('signup', __name__)
 
 githubApi = GithubApi()
 
-@bp.route("/signup/redirect", methods=['GET'])
+@bp.route("/signup/redirect")  
 def singupRedirect():
     githubLoginUrl = githubApi.getLoginUrl()
     return redirect(githubLoginUrl)
@@ -33,7 +33,6 @@ def signupComplete():
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
         key = hashlib.sha256(accessToken.encode()).hexdigest()
-        print("🍎" + key)
         inMemoryCacheInstance.set(key, accessToken)
         # 이후 signup.html 페이지로 리다이렉트합니다.
         return redirect(f'/signup?code={key}')
@@ -45,7 +44,9 @@ def signupComplete():
 def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
-    print("🍎🍎" + code)
+    print(code)
+    if code is None:
+        return redirect('/signup/redirect')
     return render_template('signup.html',code=code)
        
         
@@ -54,7 +55,7 @@ def signupUpdate():
   
     code = request.args.get('code')
     github_access_token = inMemoryCacheInstance.get(code)
-    print("🍎🍎" + code)
+    print(code)
 
     id = request.form['id']
     password = request.form['password']
@@ -109,7 +110,10 @@ def signupUpdate():
 
     # main 화면에 전달 
     key = hashlib.sha256(accessToken.encode()).hexdigest()
-    inMemoryCacheInstance.set(key, accessToken)
+    clientInfo = {
+        'access_token': accessToken
+    }
+    inMemoryCacheInstance.set(key, clientInfo)
  
     # tokentable에 token정보 추가
     tokentable = TokenTable(
@@ -125,7 +129,7 @@ def signupUpdate():
     # count batch refresh 
     # CommitCountScheduler().job()
 
-    return redirect('/main')
+    return redirect(f'/main?code={key}')
 
 
 @bp.route("/signup/fail")
