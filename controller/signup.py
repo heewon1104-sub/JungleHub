@@ -45,7 +45,6 @@ def signup():
         
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
-
     code = request.args.get('code')
     access_token = inMemoryCacheInstance.get(code)
 
