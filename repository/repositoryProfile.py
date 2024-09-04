@@ -28,6 +28,22 @@ class UserTable:
         self.bio = bio
         self.gitId = gitId
         self.githubaccesstoken = githubaccesstoken
+
+     # 객체를 딕셔너리로 변환하는 메서드
+    def to_dict(self):
+        return {
+            "_id": self._id,
+            "id": self.id,
+            "pic_url": self.pic_url,
+            "generation": self.generation,
+            "num": self.num,
+            "name": self.name,
+            "like": self.like,
+            "git": self.git,
+            "bio": self.bio,
+            "gitId": self.gitId,
+            "githubaccesstoken": self.githubaccesstoken
+        }
      
     def __repr__(self):
         return f"<UserTable(id={self.id}, name={self.name}, generation={self.generation})>"
@@ -111,24 +127,24 @@ class ProfileRepository:
 
     # _id를 기반으로 유저 테이블 정보를 읽어오는 함수
     def read_all(self, user_id):
-        data = self.collection.find_one({'_id': ObjectId(user_id)})
-        if data:
-            usertable = UserTable(
-                _id=str(data['_id']),
-                id=data['id'],
-                password=data['password'],
-                pic_url=data['pic_url'],
-                generation=data['generation'],
-                num=data['num'],
-                name=data['name'],
-                like=data['like'],
-                git=data['git'],
-                bio=data['bio'],
-                githubaccesstoken=data['githubaccesstoken'],
-                gitId=data['gitId']
-            )
-            return usertable
-        return None
+        return self.collection.find_one({'_id': ObjectId(user_id)})
+        # if data:
+        #     usertable = UserTable(
+        #         _id=data['_id'],
+        #         id=data['id'],
+        #         password=data['password'],
+        #         pic_url=data['pic_url'],
+        #         generation=data['generation'],
+        #         num=data['num'],
+        #         name=data['name'],
+        #         like=data['like'],
+        #         git=data['git'],
+        #         bio=data['bio'],
+        #         githubaccesstoken=data['githubaccesstoken'],
+        #         gitId=data['gitId']
+        #     )
+        #     return usertable
+        # return None
     
     # _id를 기반으로 bio 읽어서 return하는 함수
     def read_bio(self, user_id):
@@ -281,13 +297,16 @@ class TokenRepository:
         for data in cursor:
             tokentable = TokenTable(
                 userId=data['userId'],
-                accesstoken=data['accesstoken']
+                accesstoken=data['accesstoken'],
+                refreshtoken=data['refreshtoken'],
+                updateat=data['updateat'],
+                createdat=data['createdat']
+
             )
             accesstokenList.append(tokentable)
             
         return accesstokenList
 
-    # _id를 기반으로 유저 테이블 정보를 읽어오는 함수
     def read_all_token(self, user_id):
         data = self.collection.find_one({'userId': user_id})
         if data:

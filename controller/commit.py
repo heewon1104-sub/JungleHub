@@ -9,9 +9,15 @@ bp = Blueprint('commit', __name__)
 @bp.route('/commit/user/list')
 def commitUserList():
     userCommitCountRepository # 오늘 유저들 가져옴 - 해당 idx로 user repo에서 가져옴 
-    list = userCommitCountRepository.todayList()
+    todayCommitUserList = userCommitCountRepository.todayList()
+    userList = profile_repository.read_all_jungler()
+    list = []
+    for today in todayCommitUserList:
+        for user in userList:
+            if user._id == today.userKey:
+                list.append(user)
     result = {
-        "userList": [a.to_dict() for a in list]
+        "userList": [ { "name": a.id + f'({a.gitId})', "id": a._id  } for a in list]
     }
     return jsonify(result)
 
@@ -23,13 +29,8 @@ def commitTotalCount():
     }
     return jsonify(result)
 
-@bp.route('/commit/board/block/list')
-def commitBlockList():
-    result = {
-        "indices": [1,5,34]
-    }
-    return jsonify(result)
 
-# @bp.route('/commit')
-# def ():
-#     return 'hello'
+@bp.route('/commit/board/open/list')
+def commitOpenList():
+
+    return
