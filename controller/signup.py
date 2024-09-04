@@ -46,8 +46,6 @@ def signupComplete():
 
     # main 화면에서 사용할 client 정보.
     clientInfo = { 'access_token': 'access 토큰 입니다.' }
-    print("💩")
-    print(str(clientInfo))
     key = hashlib.sha256(str(clientInfo).encode()).hexdigest()
     inMemoryCacheInstance.set(key, clientInfo)
 

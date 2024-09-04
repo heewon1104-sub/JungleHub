@@ -3,34 +3,175 @@ var screenWidth80Percent = window.innerWidth * 0.5;
 
 // 숨기고자 하는 타일 ID를 지정하는 배열
 var list = [1, 3, 6, 20, 21, 34];
+var commit_user = [
+  'Test account1',
+  'Test account2',
+  'Test account3',
+  'Test account4',
+  'Test account5',
+  'Test account6',
+  'Test account7',
+  'Test account8',
+  'Test account9',
+  'Test account10',
+  'Test account11',
+  'Test account12',
+  'Test account13',
+  'Test account14',
+  'Test account15',
+  'Test account16',
+  'Test account17',
+  'Test account18',
+];
 
-// 페이지 로드 시 DAY 계산 및 업데이트
+let isFirstAnimationPlaying = false;
+
+function createObserver() {
+  let observer;
+
+  let options = {
+    root: null, // 뷰포트를 루트로 사용
+    rootMargin: '0px',
+    threshold: 0.5, // 50%가 보일 때 트리거
+  };
+
+  observer = new IntersectionObserver(handleIntersect, options);
+
+  observer.observe(document.querySelector('#animation-text')); // 첫 번째 텍스트 애니메이션 요소 관찰
+  observer.observe(document.querySelector('#wave')); // 두 번째 텍스트 애니메이션 요소 관찰
+  observer.observe(document.querySelector('.section-2'));
+}
+
+function handleIntersect(entries, observer) {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      if (entry.target.id === 'animation-text') {
+        startFirstAnimation(); // 첫 번째 텍스트 애니메이션 시작
+      } else if (entry.target.id === 'wave') {
+        startSecondAnimation(); // 두 번째 텍스트 애니메이션 시작
+      } else if (entry.target.classList.contains('section-2')) {
+        commitAnimation(); // 커밋 애니메이션 시작
+      }
+    }
+  });
+}
+
+function startFirstAnimation() {
+  if (isFirstAnimationPlaying) return; // 애니메이션이 이미 진행 중이라면 중복 실행 방지
+
+  isFirstAnimationPlaying = true;
+  const content = 'Github를 한눈에';
+  let i = 0;
+  const text = document.querySelector('#animation-text');
+  text.classList.remove('hidden');
+
+  function typing() {
+    const wave = document.querySelector('#wave');
+    wave.classList.add('hidden');
+
+    if (i < content.length) {
+      let txt = content.charAt(i);
+      text.innerHTML += txt;
+      i++;
+    } else {
+      clearInterval(typingInterval); // 타이핑 애니메이션이 완료되면 멈춤
+      setTimeout(showSecondText, 1000); // 1초 후에 두 번째 텍스트 표시
+    }
+  }
+
+  let typingInterval = setInterval(typing, 200);
+}
+
+// 두 번째 텍스트 애니메이션 함수
+function startSecondAnimation() {
+  const wave = document.querySelector('#wave');
+  wave.classList.remove('hidden');
+
+  wave.innerHTML = wave.textContent
+    .split('')
+    .map((letter, idx) => {
+      if (letter === ' ') return ' ';
+      return `<span style="animation-delay:${
+        idx * 15
+      }ms" class="letter">${letter}</span>`;
+    })
+    .join('');
+}
+
+// 두 번째 텍스트 애니메이션 함수
+function showSecondText() {
+  const text = document.querySelector('#animation-text');
+  text.classList.add('hidden');
+  startSecondAnimation();
+}
+
+// 커밋 애니메이션 함수
+function commitAnimation() {
+  let countBox = document.querySelector('#animation-commit');
+  let count = 0;
+  let num = 1234;
+
+  let counting = setInterval(function () {
+    if (count >= num) {
+      count = num;
+      clearInterval(counting);
+    } else {
+      count += 10;
+    }
+    countBox.innerHTML = new Intl.NumberFormat().format(count);
+  }, 10);
+
+  // 커밋 애니메이션 텍스트 보이기
+  countBox.hidden = false;
+}
+
+// 페이지 로드 시 필요한 모든 초기화 작업 수행
 window.onload = function () {
+  // localStorage.setItem('key', null);
+
+  createObserver();
+
+  commitAnimation();
+
+  // 날짜 계산
   document.getElementById('day-display').innerText = calculateDay();
+
+  // 기여자 목록을 표시할 컨테이너 요소 선택
+  const contributorsContainer = document.getElementById('contributors');
+
+  // 반복문을 통해 기여자 요소 생성 및 추가
+  commit_user.forEach((user, index) => {
+    const span = document.createElement('span');
+    span.className = 'text-green-500';
+    span.textContent = user;
+    contributorsContainer.appendChild(span);
+  });
+
+  // Initialize tiles after DOM is loaded
+  initializeTiles();
+
+  // Call function to update header links based on the token
+  updateHeaderLinks();
 };
 
 // 현재 날짜를 기준으로 DAY를 계산하는 함수
 function calculateDay() {
   const now = new Date();
-  const startDay = new Date('2024-09-01T06:00:00'); // 기준 시작 날짜와 시간 (9/1 06:00am)
-  const oneDay = 24 * 60 * 60 * 1000; // 하루를 밀리초로 변환
+  const startDay = new Date('2024-09-02T00:00:00');
+  const oneDay = 24 * 60 * 60 * 1000;
 
-  // 현재 시간이 6시 이전이면 어제 날짜를 기준으로 계산
   if (now.getHours() < 6) {
     now.setDate(now.getDate() - 1);
   }
 
-  const diffDays = Math.floor((now - startDay) / oneDay); // 시작일로부터 경과한 일 수 계산
-  const dayNumber = Math.floor(diffDays / 1); // 일(day) 기준으로 DAY 계산
+  const diffDays = Math.ceil((now - startDay) / oneDay);
+  const dayNumber = Math.ceil(diffDays / 1); // 일(day) 기준으로 DAY 계산
 
   // 표시할 기간을 설정 (예: 9/3~9/4)
-  const periodStart = new Date(
-    startDay.getTime() + dayNumber * oneDay + oneDay
-  );
-  const periodEnd = new Date(periodStart.getTime() + oneDay);
-  const periodText = `${formatDate(periodStart)} ~ ${formatDate(periodEnd)}`;
+  const periodStart = new Date(now);
+  const periodText = `${formatDate(periodStart)}`;
 
-  return `DAY${dayNumber + 1} (${periodText})`;
+  return `${periodText}(Day${dayNumber})`;
 }
 
 // 날짜 형식을 'MM/DD'로 변환하는 함수
@@ -40,7 +181,129 @@ function formatDate(date) {
   return `${month}/${day}`;
 }
 
-// 페이지 로드 시 DAY 계산 및 업데이트
-window.onload = function () {
-  document.getElementById('day-display').innerText = calculateDay();
-};
+// 타일 초기화 함수
+function initializeTiles() {
+  // 타일 컨테이너 가져오기
+  const tileContainer = document.getElementById('tile-container');
+
+  // 타일 컨테이너의 너비 설정
+  tileContainer.style.width = screenWidth80Percent + 'px';
+
+  // 임시 이미지 객체를 만들어 원본 크기를 가져옴
+  const tempImage = new Image();
+  tempImage.src = 'https://picsum.photos/500';
+
+  tempImage.onload = function () {
+    // 이미지 로드가 완료된 후에 해상도를 사용하여 높이를 계산
+    const imageWidth = this.naturalWidth;
+    const imageHeight = this.naturalHeight;
+    const imageAspectRatio = imageHeight / imageWidth; // 이미지의 가로:세로 비율 계산
+
+    // 이미지 비율에 맞게 높이 설정
+    const containerHeight = screenWidth80Percent * imageAspectRatio;
+    tileContainer.style.height = containerHeight + 'px';
+
+    // 35개의 타일 생성
+    for (let i = 1; i <= 35; i++) {
+      // 타일 ID는 1부터 35까지
+      const tile = document.createElement('div');
+      tile.style = 'position: relative; width: 100%; height: 100%;';
+      tile.id = 'tile-' + i; // 각 타일에 고유 ID 부여 (예: tile-1, tile-2, ...)
+
+      // list에 있는 ID를 가진 타일은 투명한 타일로 설정
+      if (list.includes(i)) {
+        tile.className = 'tile transparent-tile rounded-lg';
+      } else {
+        tile.className = 'tile bg-green-500 rounded-lg';
+      }
+      tileContainer.appendChild(tile);
+    }
+
+    //토큰 로직
+    let tokenElement = document.getElementById('token');
+    let tokenValue = tokenElement.value;
+    if (tokenValue == '' || tokenValue == null) {
+      if (localStorage.getItem('key') == null) {
+        localStorage.setItem('key', null);
+      }
+    } else {
+      let changedToken = tokenValue.replace(/'/g, `"`);
+      let tokenObject = JSON.parse(changedToken);
+      localStorage.setItem('key', tokenObject.access_token);
+    }
+  };
+}
+
+// Function to update header links based on the token
+function updateHeaderLinks() {
+  const authLinksContainer = document.getElementById('auth-links');
+  const token = localStorage.getItem('key');
+
+  console.log('KEY : ', token);
+
+  if (token === 'null' || token === null) {
+    authLinksContainer.innerHTML = `
+      <a href="/login" class="text-green-500 hover:underline font-bold text-lg">로그인</a>
+      <span class="mx-2">|</span>
+      <a href="/signup" class="text-green-500 hover:underline font-bold text-lg">회원가입</a>
+    `;
+  } else {
+    authLinksContainer.innerHTML = `
+      <a href="/profile" class="text-green-500 hover:underline font-bold text-lg">프로필</a>
+    `;
+  }
+}
+
+$(window)
+  .scroll(function () {
+    var scrollTop = $(window).scrollTop();
+    var section1Height = $('.section-1').outerHeight();
+    var section2 = $('.section-2');
+
+    if (section2.length) {
+      var section2Top = section2.offset().top;
+      var windowHeight = $(window).height();
+
+      // 색상 보간 함수
+      function interpolateColor(color1, color2, factor) {
+        var result = color1.slice();
+        for (var i = 0; i < 3; i++) {
+          result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
+        }
+        return result;
+      }
+
+      // RGB 값을 CSS rgb 문자열로 변환
+      function rgbToCSS(rgb) {
+        return 'rgb(' + rgb.join(',') + ')';
+      }
+
+      // 색상 정의
+      var color1 = [0, 0, 0];
+      var color2 = [255, 255, 255];
+
+      if (scrollTop < section1Height - windowHeight / 10) {
+        // 첫 번째 섹션이 보일 때
+        $('body').css('background-color', rgbToCSS(color1));
+      } else if (
+        scrollTop >= section1Height - windowHeight / 10 &&
+        scrollTop < section2Top + section2.outerHeight() - windowHeight / 10
+      ) {
+        // 두 번째 섹션이 보일 때 (부드러운 전환)
+        var factor =
+          (scrollTop - (section1Height - windowHeight / 10)) /
+          (section2Top - (section1Height - windowHeight / 10));
+        var interpolatedColor = interpolateColor(color1, color2, factor);
+        $('body').css('background-color', rgbToCSS(interpolatedColor));
+      } else {
+        // 세 번째 섹션이 보일 때 (부드러운 전환)
+        var section3Start =
+          section2Top + section2.outerHeight() - windowHeight / 4; // 높이를 약간 더 위로 조정
+        var factor = (scrollTop - section3Start) / (windowHeight / 2); // 마지막 섹션으로 스크롤 시 보간
+        factor = Math.min(1, Math.max(0, factor)); // 0과 1 사이로 제한
+        var interpolatedColor = interpolateColor(color2, color1, factor);
+        $('body').css('background-color', rgbToCSS(interpolatedColor));
+      }
+    }
+  })
+  .scroll();
