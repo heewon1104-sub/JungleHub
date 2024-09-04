@@ -135,28 +135,44 @@ def save_profile():
 
 @bp.route('/profile/like', methods=['POST'])  # DB에 있는 like +1
 def update_like():
-   # 요청 헤더에서 Authorization 헤더로 accessToken 가져오기
+
+    # 요청 헤더에서 Authorization 헤더로 accessToken 가져오기
     access_token = request.headers.get('Authorization')
+    print(access_token)
 
     if not access_token:
-        return jsonify(success=False, message="Access token is missing"), 400
+        return "Access token is missing or invalid", 400
+    
 
-    # 토큰 유효성 검증
+    # "Bearer " 부분 제거하고 토큰만 추출
+    token = access_token.split("Bearer ")[-1]
+    print(token)
+
+
+
+    accesstokenList = token_repository.read_all_accesstoken()
+
+     # 토큰 유효성 검증
     try:
-        payload = jwt.decode(access_token, "MY_SECRET_KEY", algorithms=["HS256"])
-        user_id = payload.get("userId")
-        
-        if not user_id:
-            return jsonify(success=False, message="Invalid token"), 401
 
-        # 데이터베이스에서 like 값을 증가시키고 업데이트된 like 값을 반환
-        like = profile_repository.update_like_num(user_id)
-        
-        if like is not None:
-            return jsonify(success=True, like=like)
-        else:
-            return jsonify(success=False), 404
+        # 데이터베이스에서 해당 유저의 accesstoken을 조회하여 비교
+        for token_entry in accesstokenList:
+            if token_entry.accesstoken == token:
+                userId = token_entry.userId
+                
+                # 유저의 좋아요 수를 +1 증가시키고, 업데이트된 like 값을 반환
+                updated_like = profile_repository.update_like_num(userId)
+                if updated_like is not None:
+                    return jsonify(updated_like), 200
+                else:
+                    return jsonify({"error": "Failed to update like"}), 500
+
+
+        # 토큰이 데이터베이스의 accesstoken과 일치하지 않으면 에러 반환
+        return jsonify({"error": "Token is invalid"}), 401
+
     except jwt.ExpiredSignatureError:
-        return jsonify(success=False, message="Token has expired"), 401
+        return jsonify({"error": "Token has expired"}), 401
     except jwt.InvalidTokenError:
-        return jsonify(success=False, message="Invalid token"), 401
+        return jsonify({"error": "Invalid token"}), 401
+    
