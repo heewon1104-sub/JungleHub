@@ -2,27 +2,12 @@
 var screenWidth80Percent = window.innerWidth * 0.5;
 
 // 숨기고자 하는 타일 ID를 지정하는 배열
-var list = [1, 3, 6, 20, 21, 34];
-var commit_user = [
-  'Test account1',
-  'Test account2',
-  'Test account3',
-  'Test account4',
-  'Test account5',
-  'Test account6',
-  'Test account7',
-  'Test account8',
-  'Test account9',
-  'Test account10',
-  'Test account11',
-  'Test account12',
-  'Test account13',
-  'Test account14',
-  'Test account15',
-  'Test account16',
-  'Test account17',
-  'Test account18',
-];
+var list = [1, 3, 20, 21, 34, 6, 7];
+
+// 전역 변수 선언
+var user_list = [];
+
+let totalCount = 0;
 
 let isFirstAnimationPlaying = false;
 
@@ -39,7 +24,7 @@ function createObserver() {
 
   observer.observe(document.querySelector('#animation-text')); // 첫 번째 텍스트 애니메이션 요소 관찰
   observer.observe(document.querySelector('#wave')); // 두 번째 텍스트 애니메이션 요소 관찰
-  observer.observe(document.querySelector('.section-2'));
+  observer.observe(document.querySelector('.section-2')); // 섹션 2 관찰
 }
 
 function handleIntersect(entries, observer) {
@@ -109,14 +94,14 @@ function showSecondText() {
 function commitAnimation() {
   let countBox = document.querySelector('#animation-commit');
   let count = 0;
-  let num = 1234;
+  let num = totalCount;
 
   let counting = setInterval(function () {
     if (count >= num) {
       count = num;
       clearInterval(counting);
     } else {
-      count += 10;
+      count += 1;
     }
     countBox.innerHTML = new Intl.NumberFormat().format(count);
   }, 10);
@@ -124,35 +109,6 @@ function commitAnimation() {
   // 커밋 애니메이션 텍스트 보이기
   countBox.hidden = false;
 }
-
-// 페이지 로드 시 필요한 모든 초기화 작업 수행
-window.onload = function () {
-  // localStorage.setItem('key', null);
-
-  createObserver();
-
-  commitAnimation();
-
-  // 날짜 계산
-  document.getElementById('day-display').innerText = calculateDay();
-
-  // 기여자 목록을 표시할 컨테이너 요소 선택
-  const contributorsContainer = document.getElementById('contributors');
-
-  // 반복문을 통해 기여자 요소 생성 및 추가
-  commit_user.forEach((user, index) => {
-    const span = document.createElement('span');
-    span.className = 'text-green-500';
-    span.textContent = user;
-    contributorsContainer.appendChild(span);
-  });
-
-  // Initialize tiles after DOM is loaded
-  initializeTiles();
-
-  // Call function to update header links based on the token
-  updateHeaderLinks();
-};
 
 // 현재 날짜를 기준으로 DAY를 계산하는 함수
 function calculateDay() {
@@ -203,39 +159,51 @@ function initializeTiles() {
     const containerHeight = screenWidth80Percent * imageAspectRatio;
     tileContainer.style.height = containerHeight + 'px';
 
-    // 35개의 타일 생성
     for (let i = 1; i <= 35; i++) {
-      // 타일 ID는 1부터 35까지
-      const tile = document.createElement('div');
-      tile.style = 'position: relative; width: 100%; height: 100%;';
-      tile.id = 'tile-' + i; // 각 타일에 고유 ID 부여 (예: tile-1, tile-2, ...)
+      const tileContainerElement = document.createElement('div');
 
-      // list에 있는 ID를 가진 타일은 투명한 타일로 설정
       if (list.includes(i)) {
-        tile.className = 'tile transparent-tile rounded-lg';
+        // list에 있는 ID를 가진 타일은 초록색 타일로 설정
+        tileContainerElement.className = 'tile bg-green-500 rounded-lg';
       } else {
-        tile.className = 'tile bg-green-500 rounded-lg';
+        // list에 없는 ID를 가진 타일은 플립 애니메이션 적용
+        tileContainerElement.className = 'flip-container';
+
+        const tile = document.createElement('div');
+        tile.style = 'position: relative; width: 100%; height: 100%;';
+        tile.id = 'tile-' + i;
+        tile.className = 'flip-card';
+
+        const front = document.createElement('div');
+        front.className = 'flip-card-front';
+
+        const back = document.createElement('div');
+        back.className = 'flip-card-back';
+
+        tile.appendChild(front);
+        tile.appendChild(back);
+        tileContainerElement.appendChild(tile);
+
+        // 옵저버로 타일이 보일 때만 애니메이션 실행
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                tile.classList.add('flipped'); // 타일에 플립 클래스 추가
+                observer.unobserve(entry.target); // 애니메이션은 한 번만 실행되도록 옵저버 제거
+              }
+            });
+          },
+          {
+            threshold: 0.5, // 타일이 50% 이상 보일 때 트리거
+          }
+        );
+
+        observer.observe(tileContainerElement);
       }
-      tileContainer.appendChild(tile);
+
+      tileContainer.appendChild(tileContainerElement);
     }
-
-    //토큰 로직
-    let tokenElement = document.getElementById('token');
-    let tokenValue = tokenElement.value;
-
-    console.log(tokenValue)
-
-    if (tokenValue == '' || tokenValue == null) {
-      if (localStorage.getItem('key') == null) {
-        localStorage.setItem('key', null);
-      }
-    } else {
-      let changedToken = tokenValue.replace(/'/g, `"`);
-      let tokenObject = JSON.parse(changedToken);
-      localStorage.setItem('key', tokenObject.access_token);
-    }
-
-    updateHeaderLinks();
   };
 }
 
@@ -244,12 +212,8 @@ function updateHeaderLinks() {
   const authLinksContainer = document.getElementById('auth-links');
   const token = localStorage.getItem('key');
 
-  console.log('KEY : ', token);
-
   if (token === 'null' || token === null) {
     authLinksContainer.innerHTML = `
-      <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
-      <span class="mx-2">|</span>
       <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
     `;
   } else {
@@ -259,6 +223,87 @@ function updateHeaderLinks() {
   }
 }
 
+const fetchUserList = async () => {
+  try {
+    const response = await fetch('/commit/user/list'); // fetch 요청을 보내고 응답을 기다림
+    const data = await response.json(); // 응답을 JSON 형태로 파싱하고 결과를 기다림
+
+    if (data && data.userList) {
+      user_list = data.userList; // 서버로부터 받은 userList로 업데이트
+
+      console.log(user_list);
+
+      // 기여자 목록을 표시할 컨테이너 요소 선택
+      const contributorsContainer = document.getElementById('contributors');
+
+      // 반복문을 통해 기여자 요소 생성 및 추가
+      user_list.forEach((user) => {
+        const span = document.createElement('span');
+        span.className = 'text-green-500';
+        span.textContent = user.name;
+        console.log(user);
+        console.log(user._id);
+        contributorsContainer.appendChild(span);
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching user list:', error);
+  }
+};
+
+const commitCount = async () => {
+  try {
+    const response = await fetch('/commit/total-count'); // fetch 요청을 보내고 응답을 기다림
+    const data = await response.json(); // 응답을 JSON 형태로 파싱하고 결과를 기다림
+
+    totalCount = data.commitTotalCount; // 서버로부터 받은 commitTotalCount로 업데이트
+  } catch (error) {
+    console.error('Error fetching total commit count:', error);
+  }
+};
+
+// 페이지 로드 시 필요한 모든 초기화 작업 수행
+window.onload = async function () {
+  // localStorage.setItem('key', null);
+
+  createObserver();
+
+  // Fetch commit count before animation
+  await commitCount();
+
+  // 시작 애니메이션 실행
+  commitAnimation();
+
+  // 날짜 계산
+  document.getElementById('day-display').innerText = calculateDay();
+
+  // Initialize tiles after DOM is loaded
+  initializeTiles();
+
+  // Fetch user list and update UI accordingly
+  fetchUserList();
+
+  //토큰 로직
+  let tokenElement = document.getElementById('token');
+  let tokenValue = tokenElement.value;
+
+  if (tokenValue == '' || tokenValue == null) {
+    if (localStorage.getItem('key') == null) {
+      localStorage.setItem('key', null);
+    }
+  } else {
+    let changedToken = tokenValue.replace(/'/g, `"`);
+    let tokenObject = JSON.parse(changedToken);
+    localStorage.setItem('key', tokenObject.access_token);
+  }
+
+  console.log('Bearer ' + localStorage.getItem('key'));
+
+  // Call function to update header links based on the token
+  updateHeaderLinks();
+};
+
+// 스크롤 이벤트 처리
 $(window)
   .scroll(function () {
     var scrollTop = $(window).scrollTop();

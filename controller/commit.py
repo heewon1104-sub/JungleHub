@@ -29,6 +29,7 @@ def commitTotalCount():
     }
     return jsonify(result)
 
+
 @bp.route('/commit/board/open/list')
 def commitOpenList():
 
