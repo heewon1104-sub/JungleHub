@@ -51,7 +51,6 @@ def signupComplete():
     key = hashlib.sha256(str(clientInfo).encode()).hexdigest()
     inMemoryCacheInstance.set(key, clientInfo)
 
-
     # TODO: batch refresh 해줘야 한다!!
 
     # redirect할 때 hash key를 param으로 넣어준다. 
