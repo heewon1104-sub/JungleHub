@@ -1,5 +1,6 @@
 from bson import ObjectId
-from repository.repositoryConfig import client
+from repository.repositoryConfig import client, RepositoryConfig
+from datetime import datetime
 
 class UserTable:
     def __init__(self, 
@@ -12,10 +13,6 @@ class UserTable:
                  name, 
                  like, 
                  githubaccesstoken, 
-                 accesstoken, 
-                 refreshtoken, 
-                 updateat, 
-                 createdat, 
                  git=None, 
                  commit=None, 
                  bio=None):
@@ -31,21 +28,18 @@ class UserTable:
         self.commit = commit
         self.bio = bio
         self.githubaccesstoken = githubaccesstoken
-        self.accesstoken = accesstoken
-        self.refreshtoken = refreshtoken
-        self.updateat = updateat
-        self.createdat = createdat
      
     def __repr__(self):
         return f"<UserTable(id={self.id}, name={self.name}, generation={self.generation})>"
     
-
-
 class ProfileRepository:
+
+    COLLECTION_NAME = 'user'
+
     def __init__(self, client):
         self.client = client
-        self.db = client['dbjungle']
-        self.collection = self.db['user']
+        self.db = client[RepositoryConfig.databaseName]
+        self.collection = self.db[self.COLLECTION_NAME]
 
     # 새 유저 테이블 생성 함수
     def create(self, usertable):
@@ -60,11 +54,7 @@ class ProfileRepository:
             "git": usertable.git,
             "commit": usertable.commit,
             "bio": usertable.bio,           # 자기소개
-            "githubaccesstoken":usertable.githubaccesstoken,
-            "accesstoken":usertable.accesstoken,
-            "refreshtoken":usertable.refreshtoken,
-            "updateat":usertable.updateat,
-            "createdat":usertable.createdat
+            "githubaccesstoken":usertable.githubaccesstoken
         }
         result = self.collection.insert_one(data)
         usertable._id = str(result.inserted_id)  # MongoDB의 ObjectId를 문자열로 저장
@@ -170,7 +160,112 @@ class ProfileRepository:
         result = self.collection.delete_many({})
         return result.deleted_count  # 삭제된 문서 수 반환
 
-        
-
-
 profile_repository = ProfileRepository(client)
+
+
+class TokenTable:
+    def __init__(self, 
+                 userId, 
+                 accesstoken, 
+                 refreshtoken, 
+                 updateat, 
+                 createdat):
+        self.userId = userId 
+        self.accesstoken = accesstoken                  # jwt
+        self.refreshtoken = refreshtoken                # jwt
+        self.updateat = updateat
+        self.createdat = createdat
+     
+    def __repr__(self):
+        return f"<TokenTable(_id={self._id}, accesstoken={self.accesstoken})>"
+
+
+class TokenRepository:
+    def __init__(self, client):
+        self.client = client
+        self.db = client['dbjungle']
+        self.collection = self.db['token']
+
+    # 새 유저 테이블 생성 함수
+    def create(self, tokentable):
+        data = {
+            "userId": tokentable.userId,
+            "accesstoken":tokentable.accesstoken,
+            "refreshtoken":tokentable.refreshtoken,
+            "updateat":tokentable.updateat,
+            "createdat":tokentable.createdat
+        }
+        result = self.collection.insert_one(data)
+        return tokentable
+    
+    # _id를 기반으로 updateat을 수정하는 함수
+    def update_updateat(self, userId): 
+        result = self.collection.find_one_and_update(
+            {'userId': userId},
+            {'$set': {'updateat': datetime.now()}},
+            return_document=True
+        )
+        if result:
+            return result['updateat']
+        return None
+    
+    # _id를 기반으로 accesstoken을 수정하는 함수
+    def update_accesstoken(self, userId, accesstoken): 
+        result = self.collection.find_one_and_update(
+            {'userId': userId},
+            {'$set': {'accesstoken': accesstoken}},
+            return_document=True
+        )
+        if result:
+            return result['accesstoken']
+        return None
+    
+    # 데이터베이스의 모든 유저의 정보를 읽어오는 함수
+    def read_all_jungler(self):
+        junglerList = []
+        cursor = self.collection.find()  # 모든 문서를 가져옴
+
+        for data in cursor:
+            tokentable = TokenTable(
+                userId=data['userId'],
+                accesstoken=data['accesstoken'],
+                refreshtoken=data['refreshtoken'],
+                updateat=data['updateat'],
+                createdat=data['createdat']
+            )
+            junglerList.append(tokentable)
+
+        return junglerList
+
+
+
+    # 데이터베이스의 모든 유저의 _id, accesstoken 알아오는 함수
+    # 프로필 조회
+    def read_all_accesstoken(self):
+        accesstokenList = []
+        cursor = self.collection.find()  # 모든 문서를 가져옴
+
+        for data in cursor:
+            tokentable = TokenTable(
+                userId=data['userId'],
+                accesstoken=data['accesstoken']
+            )
+            accesstokenList.append(tokentable)
+            
+        return accesstokenList
+
+    # _id를 기반으로 유저 테이블 정보를 읽어오는 함수
+    def read_all_token(self, user_id):
+        data = self.collection.find_one({'userId': user_id})
+        if data:
+            tokentable = TokenTable(
+                userId=data['userId'],
+                accesstoken=data['accesstoken'],
+                refreshtoken=data['refreshtoken'],
+                updateat=data['updateat'],
+                createdat=data['createdat']
+            )
+            return tokentable
+        return None
+
+token_repository = TokenRepository(client)

@@ -1,13 +1,15 @@
-from repository.repositoryConfig import client
+from repository.repositoryConfig import client, RepositoryConfig
 from datetime import datetime, timezone
 from model.dayTotalCommitCount import DayTotalCommitCount
 
 class DayTotalCommitCountRepository: 
 
+    COLLECTION_NAME = 'dayTotalCount'
+
     def __init__(self, client):
         self.client = client
-        self.db = client['dbjungle']
-        self.collection = self.db['dayTotalCount']
+        self.db = client[RepositoryConfig.databaseName]
+        self.collection = self.db[self.COLLECTION_NAME]
 
     def create(self, dayTotalCount):
         data = dayTotalCount.to_dict()
@@ -21,9 +23,9 @@ class DayTotalCommitCountRepository:
             list.append(item)
         return list;
     
-    def updateCount(self, dayTotalCount, newCount):
+    def updateCount(self, key, newCount):
         self.collection.update_one(
-            {'key': dayTotalCount.key},
+            {'key': key},
             {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }}
         )
 

@@ -28,8 +28,8 @@
             <span class="text-green-500 text-3xl font-bold">JungleHub</span>
         </div>
 
-        <form action="{{ url_for('signup.signupUpdate') }}" method="post" enctype="multipart/form-data" onSu
-            onsubmit="return validateForm()" class="space-y-4">
+        <form action="{{ url_for('signup.signupUpdate', code=code) }}" method="post" 
+                enctype="multipart/form-data" onsubmit="return validateForm()" class="space-y-4">
             <!-- ID Input -->
             <div class="relative mt-4"> <!-- Add margin-top class -->
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">

@@ -1,7 +1,15 @@
 from flask import Flask
 from controller import main, login, user_profile, signup
+import os
+
+from batch.CommitCountScheduler import CommitCountScheduler
+
+# 배포전 실행 
+# CommitCountScheduler().run()
+
 
 app = Flask(__name__)
+
 
 # 블루프린트 등록 
 app.register_blueprint(main.bp)

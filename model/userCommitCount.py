@@ -34,6 +34,6 @@ class UserCommitCount():
         updatedAt = data.get('updatedAt')
         createdAt = data.get('createdAt')
 
-        return UserCommitCount(key=key, count=count, updatedAt=updatedAt, createdAt=createdAt)
+        return UserCommitCount(key=key, userKey=userKey, count=count, updatedAt=updatedAt, createdAt=createdAt)
 
 
