@@ -1,25 +1,25 @@
 from datetime import datetime, timezone, timedelta
 
-class DayTotalCommitCount:
+class BoardBlockList:
 
-    @staticmethod
-    def makeCurrentDayKey():
+    @classmethod
+    def makeKey(self):
         current = datetime.now(timezone(timedelta(hours=9-6)))
         year = current.year
         month = current.month
         day = current.day
         return f"{year}-{month}-{day}"
 
-    def __init__(self, _id, count=0, updatedAt=datetime.now(timezone.utc), createdAt=datetime.now(timezone.utc)):
+    def __init__(self, _id, indices=[], updatedAt=datetime.now(timezone.utc), createdAt=datetime.now(timezone.utc)):
         self._id = _id
-        self.count = count
+        self.openList = indices
         self.updatedAt = updatedAt
         self.createdAt = createdAt
-    
+
     def to_dict(self):
         return {
             '_id': self._id,
-            'count': self.count,
+            'openList': self.openList,
             'updatedAt': self.updatedAt,
             'createdAt': self.createdAt,
         }
@@ -27,8 +27,8 @@ class DayTotalCommitCount:
     @staticmethod
     def from_dict(data):
         _id = data.get('_id')
-        count = data.get('count')
+        openList = data.get('openList')
         updatedAt = data.get('updatedAt')
         createdAt = data.get('createdAt')
 
-        return DayTotalCommitCount(_id=_id, count=count, updatedAt=updatedAt, createdAt=createdAt)
+        return BoardBlockList(_id=_id, openList=openList, updatedAt=updatedAt, createdAt=createdAt)

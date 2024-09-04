@@ -4,7 +4,7 @@ class UserCommitCount():
 
     @staticmethod
     def makeCurrentDayUserKey(userKey): # _id로 사용 
-        current = datetime.now(timezone(timedelta(hours=9+6)))
+        current = datetime.now(timezone(timedelta(hours=9-6)))
         year = current.year
         month = current.month
         day = current.day

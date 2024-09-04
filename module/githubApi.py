@@ -142,8 +142,8 @@ class GithubApi:
     async def getTotalCommitCountTodayAsync(self, loginId, accessToken, userId):
 
         def nowDatetime():
-            # 한국시간 기준, +6 기준으로 업데이트 하기 때문에 아래와 같이 +6을 함 
-            ourZone = timezone(timedelta(hours=9+6))
+            # 한국시간 기준, +6 기준으로 업데이트 하기 때문에 아래와 같이 -6을 함 
+            ourZone = timezone(timedelta(hours=9-6))
             return datetime.now(ourZone)
 
         def nextDatetime(now):
