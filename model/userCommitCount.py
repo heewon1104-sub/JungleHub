@@ -1,14 +1,14 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 class UserCommitCount():
 
     @staticmethod
-    def makeCurrentDayUserKey(userId):
-        current = datetime.now(timezone.utc)
+    def makeCurrentDayUserKey(userKey): # _id로 사용 
+        current = datetime.now(timezone(timedelta(hours=9+6)))
         year = current.year
         month = current.month
         day = current.day
-        return f"{year}-{month}-{day}-{userId}"
+        return f"{year}-{month}-{day}-{userKey}"
 
     def __init__(self, _id, userKey, count, updatedAt=datetime.now(timezone.utc), createdAt=datetime.now(timezone.utc)):
         self._id = _id 
@@ -20,7 +20,7 @@ class UserCommitCount():
     def to_dict(self):
         return {
             '_id': self._id,
-            'userId': self.userId,
+            'userKey': self.userKey,
             'count': self.count,
             'updatedAt': self.updatedAt,
             'createdAt': self.createdAt,

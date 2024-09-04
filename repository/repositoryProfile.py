@@ -99,6 +99,7 @@ class ProfileRepository:
                 gitId=result['gitId']
             )
         return None
+    
 
     # 데이터베이스의 모든 유저의 정보를 읽어오는 함수
     def read_all_jungler(self):
@@ -157,6 +158,13 @@ class ProfileRepository:
         if data:
             return data['git']
         return None
+    
+    def read_github_access_token(self, accessToken):
+        data = self.collection.find_one({ 'githubaccesstoken': accessToken })
+        if data:
+            return data['githubaccesstoken']
+        return None
+    
 
     # _id를 기반으로 like 읽어서 +1한 값으로 저장하고 like 값을 return
     def update_like_num(self, user_id):
