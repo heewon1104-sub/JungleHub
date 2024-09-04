@@ -23,15 +23,15 @@ class DayTotalCommitCountRepository:
             list.append(item)
         return list;
     
-    def updateCount(self, key, newCount):
+    def updateCount(self, _id, newCount):
         self.collection.update_one(
-            {'key': key},
+            {'_id': _id},
             {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }}
         )
 
-    def delete(self, key):
+    def delete(self, _id):
         self.collection.delete_one(
-            { 'key': key }
+            { '_id': _id }
         )
 
 dayTotalCommitCountRepository = DayTotalCommitCountRepository(client)

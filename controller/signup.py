@@ -9,6 +9,11 @@ from repository.repositoryProfile import TokenTable
 from repository.repositoryProfile import UserTable
 from datetime import datetime
 
+from configuration.config import Config
+
+from batch.CommitCountScheduler import CommitCountScheduler
+
+
 bp = Blueprint('signup', __name__)
 
 githubApi = GithubApi()
@@ -25,13 +30,13 @@ def signupComplete():
     
     if code:
         accessToken = githubApi.getAccessToken(code)
-        print(accessToken)
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
         key = hashlib.sha256(accessToken.encode()).hexdigest()
+        print("🍎" + key)
         inMemoryCacheInstance.set(key, accessToken)
         # 이후 signup.html 페이지로 리다이렉트합니다.
-        return redirect('/signup/?code={key}')
+        return redirect(f'/signup?code={key}')
     else:
         return "GitHub 인증 실패", 400
 
@@ -40,14 +45,18 @@ def signupComplete():
 def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
+    print("🍎🍎" + code)
     return render_template('signup.html',code=code)
        
         
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
 
+    # TODO: 중복 검사 해야 함. 
+
     code = request.args.get('code')
-    access_token = inMemoryCacheInstance.get(code)
+    github_access_token = inMemoryCacheInstance.get(code)
+    print("🍎🍎" + code)
 
     id = request.form['id']
     password = request.form['password']
@@ -56,22 +65,36 @@ def signupUpdate():
     number = request.form['number']
     intro = request.form['intro']
 
-    # GitHub 인증이 완료되었음을 세션에서 확인할 수 있습니다.
+    githubUserInfo = githubApi.getUserInfo(githubAccessToken=github_access_token)
+
+    pic_url = ""
+    name = ""
+    git = ""
+    gitId = ""
+    if githubUserInfo is not None:
+        pic_url = githubUserInfo['avatar_url']
+        name = githubUserInfo['name']
+        git = githubUserInfo['html_url']
+        gitId = githubUserInfo['login']
+
+        if profile_repository.read_git(git) == git:
+            # git 로 검색해서 있으면 중복 처리
+            return redirect(f'/signup/fail?message=aleady')
 
     # 입력받은 데이터를 usertable DB에 저장
     usertable = UserTable(
         _id=None,  # MongoDB에서 자동 생성되므로 None으로 설정
         id = id,
         password = password,
-        pic_url=None, # TODO : 해주세요......
+        pic_url=pic_url,
         generation=cardinal,
         num=number,
-        name=None, # TODO : 해주세요......
+        name=name, 
         like=0,
-        git=None, # TODO : 해주세요......
-        commit=None, # TODO : 해주세요......
+        git=git, 
+        gitId=gitId,
         bio=intro,
-        githubaccesstoken = access_token
+        githubaccesstoken = github_access_token
     )
     created_user = profile_repository.create(usertable) 
     user_id = created_user._id
@@ -79,9 +102,16 @@ def signupUpdate():
  
     # jwt 토큰 발급
     payload = {"userId": user_id}
-    secret_key = "my_secret_key"
-    accessToken = jwt.encode(payload, secret_key, algorithm="HS256")
-    refreshToken = jwt.encode(payload, secret_key, algorithm="HS256")
+
+    config =Config()
+    secret_key = config.find("MY_SECRET_KEY")
+    algo = config.find("SECRET_KEY_ALGO")
+    accessToken = jwt.encode(payload, secret_key, algorithm=algo)
+    refreshToken = jwt.encode(payload, secret_key, algorithm=algo)
+
+    # main 화면에 전달 
+    key = hashlib.sha256(accessToken.encode()).hexdigest()
+    inMemoryCacheInstance.set(key, accessToken)
  
     # tokentable에 token정보 추가
     tokentable = TokenTable(
@@ -94,6 +124,13 @@ def signupUpdate():
     created_token = token_repository.create(tokentable) 
     print(f"생성된 유저의 userId: {created_token.userId}")    
 
-    # TODO: batch refresh 해줘야 한다!!
+    # count batch refresh 
+    # CommitCountScheduler().job()
 
     return redirect('/main')
+
+
+@bp.route("/signup/fail")
+def sigonupFail():
+    message = request.args.get('message')
+    return render_template('signupFail.html', message="이미 가입된 아이디입니다.")

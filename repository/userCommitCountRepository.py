@@ -26,17 +26,17 @@ class UserCommitCountRepository:
     
     def updateCount(self, userCommitCount, newCount):
         self.collection.update_one(
-            {'key': userCommitCount.key},
+            {'_id': userCommitCount._id},
             {'$set': { 'count': newCount, 'updatedAt': datetime.now(timezone.utc) }}
         )
 
     def updateAllUserCount(self, userIdAndNewCountList):
         operations = []
-        for key, newCount in userIdAndNewCountList:
+        for _id, newCount in userIdAndNewCountList:
             operations.append(
                 {
                     'updateOne': {
-                        'filter': {'key': key},
+                        'filter': {'_id': _id},
                         'update': {'$set': {'count': newCount, 'updatedAt': datetime.now(timezone.utc)}}
                     }
                 }
@@ -44,9 +44,9 @@ class UserCommitCountRepository:
         if operations:
             self.collection.bulk_write(operations)
 
-    def delete(self, key):
+    def delete(self, _id):
         self.collection.delete_one(
-            { 'key': key }
+            { '_id': _id }
         )
 
 userCommitCountRepository = UserCommitCountRepository(client=client)

@@ -12,9 +12,9 @@ class UserTable:
                  num, 
                  name, 
                  like, 
+                 gitId,
                  githubaccesstoken, 
                  git=None, 
-                 commit=None, 
                  bio=None):
         self._id = _id
         self.id = id
@@ -25,8 +25,8 @@ class UserTable:
         self.name = name
         self.like = like
         self.git = git
-        self.commit = commit
         self.bio = bio
+        self.gitId = gitId
         self.githubaccesstoken = githubaccesstoken
      
     def __repr__(self):
@@ -52,9 +52,9 @@ class ProfileRepository:
             "name": usertable.name,
             "like": usertable.like,
             "git": usertable.git,
-            "commit": usertable.commit,
             "bio": usertable.bio,           # 자기소개
-            "githubaccesstoken":usertable.githubaccesstoken
+            "githubaccesstoken":usertable.githubaccesstoken,
+            "gitId": usertable.gitId
         }
         result = self.collection.insert_one(data)
         usertable._id = str(result.inserted_id)  # MongoDB의 ObjectId를 문자열로 저장
@@ -78,8 +78,9 @@ class ProfileRepository:
                 name=result['name'],
                 like=result['like'],
                 git=result['git'],
-                commit=result['commit'],
                 bio=result['bio'],
+                githubaccesstoken=result['githubaccesstoken'],
+                gitId=result['gitId']
             )
         return None
 
@@ -99,8 +100,9 @@ class ProfileRepository:
                 name=data['name'],
                 like=data['like'],
                 git=data['git'],
-                commit=data['commit'],
                 bio=data['bio'],
+                githubaccesstoken=data['githubaccesstoken'],
+                gitId=data['gitId']
             )
             junglerList.append(usertable)
 
@@ -120,8 +122,9 @@ class ProfileRepository:
                 name=data['name'],
                 like=data['like'],
                 git=data['git'],
-                commit=data['commit'],
                 bio=data['bio'],
+                githubaccesstoken=data['githubaccesstoken'],
+                gitId=data['gitId']
             )
             return usertable
         return None
@@ -133,6 +136,12 @@ class ProfileRepository:
             return data['bio']
         return None
     
+    def read_git(self, git):
+        data = self.collection.find_one({ 'git': git })
+        if data:
+            return data['git']
+        return None
+
     # _id를 기반으로 like 읽어서 +1한 값으로 저장하고 like 값을 return
     def update_like_num(self, user_id):
         result = self.collection.find_one_and_update(
