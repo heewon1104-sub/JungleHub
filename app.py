@@ -1,7 +1,12 @@
 from flask import Flask
 from controller import main, login, user_profile, signup
+import os
 
 app = Flask(__name__)
+
+# 런타임 에러 방지
+# 환경 변수에서 SECRET_KEY를 가져오거나, 없으면 기본 값을 설정
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 
 # 블루프린트 등록 
 app.register_blueprint(main.bp)
