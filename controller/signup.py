@@ -33,7 +33,7 @@ def signupComplete():
 
         githubUserInfo = githubApi.getUserInfo(githubAccessToken=githubAccessToken)
 
-        if githubUserInfo is not None:
+        if githubUserInfo is not None:  
             git = githubUserInfo['html_url']
 
             user = profile_repository.read_git_user(git)
