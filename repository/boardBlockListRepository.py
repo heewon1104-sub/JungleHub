@@ -13,10 +13,10 @@ class BoardBlockListRepository:
         self.db = client[RepositoryConfig.databaseName]
         self.collection = self.db[self.COLLECTION_NAME]
 
-    def updateCount(self, newOpenList):
+    def update(self, newOpenList):
         self.collection.update_one(
-            {'_id': newOpenList._id},
-            {'$set': { newOpenList.to_dict() }},
+            {'_id': newOpenList._id },
+            {'$set': newOpenList.to_dict() },
             upsert=True
         )
 

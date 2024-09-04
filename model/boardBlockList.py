@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+import json
 
 class BoardBlockList:
 
@@ -19,7 +20,7 @@ class BoardBlockList:
     def to_dict(self):
         return {
             '_id': self._id,
-            'openList': self.openList,
+            'openList': json.dumps(self.openList),
             'updatedAt': self.updatedAt,
             'createdAt': self.createdAt,
         }
@@ -27,8 +28,8 @@ class BoardBlockList:
     @staticmethod
     def from_dict(data):
         _id = data.get('_id')
-        openList = data.get('openList')
+        openList = json.loads(data.get('openList'))
         updatedAt = data.get('updatedAt')
         createdAt = data.get('createdAt')
 
-        return BoardBlockList(_id=_id, openList=openList, updatedAt=updatedAt, createdAt=createdAt)
+        return BoardBlockList(_id=_id, indices=openList, updatedAt=updatedAt, createdAt=createdAt)

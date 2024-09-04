@@ -37,10 +37,10 @@ class CommitCountScheduler:
                 'accessToken': user.githubaccesstoken
             }
 
-        list = map(convert, result)
+        userList = map(convert, result)
 
         # userId, totalCommitCount
-        resultList = self.api.getAllTotalCommitCount(list=list)
+        resultList = self.api.getAllTotalCommitCount(list=userList)
 
         # dayTotalCommitCount 업데이트 
         totalCommitCount = sum([ item['totalCommitCount'] for item in resultList])
@@ -82,8 +82,9 @@ class CommitCountScheduler:
 
             lastBlock.openList = sorted(lastOpenList + newOpenList)
 
-            boardBlockListRepository.updateCount(lastBlock)
+            boardBlockListRepository.update(lastBlock)
 
         else: 
-            list = sorted(random.sample(allIndices, openCount))
-            BoardBlockList(_id=BoardBlockList.makeKey(), indices=list)
+            resultList = sorted(random.sample(allIndices, openCount))
+            new = BoardBlockList(_id=BoardBlockList.makeKey(), indices=resultList)
+            boardBlockListRepository.update(new)
