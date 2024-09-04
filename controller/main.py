@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, redirect, session
+from flask import Blueprint, render_template, redirect, request
+from module.InMemoryCache import inMemoryCacheInstance
 
 bp = Blueprint('main', __name__)
 
@@ -8,5 +9,15 @@ def root():
 
 @bp.route("/main")
 def main():
-    clientInfo = session.get('clientInfo')
-    return render_template('main.html', clientInfo = clientInfo)
+    
+    code = request.args.get('code')
+    clientInfo = inMemoryCacheInstance.get(code)
+    inMemoryCacheInstance.delete(code)
+
+    print("💩")
+    print(clientInfo)
+
+    if clientInfo is not None: 
+        return render_template('main.html', clientInfo = clientInfo)
+    else:
+        return render_template('main.html')
