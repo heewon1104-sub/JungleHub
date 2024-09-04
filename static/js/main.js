@@ -222,6 +222,9 @@ function initializeTiles() {
     //토큰 로직
     let tokenElement = document.getElementById('token');
     let tokenValue = tokenElement.value;
+
+    console.log(tokenValue)
+
     if (tokenValue == '' || tokenValue == null) {
       if (localStorage.getItem('key') == null) {
         localStorage.setItem('key', null);
@@ -231,6 +234,8 @@ function initializeTiles() {
       let tokenObject = JSON.parse(changedToken);
       localStorage.setItem('key', tokenObject.access_token);
     }
+
+    updateHeaderLinks();
   };
 }
 
@@ -243,9 +248,9 @@ function updateHeaderLinks() {
 
   if (token === 'null' || token === null) {
     authLinksContainer.innerHTML = `
-      <a href="/login" class="text-green-500 hover:underline font-bold text-lg">로그인</a>
+      <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
       <span class="mx-2">|</span>
-      <a href="/signup" class="text-green-500 hover:underline font-bold text-lg">회원가입</a>
+      <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
     `;
   } else {
     authLinksContainer.innerHTML = `
