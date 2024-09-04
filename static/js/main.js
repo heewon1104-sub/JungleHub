@@ -1,8 +1,8 @@
 // 전역 변수로 선언하여 화면 너비의 50% 값을 저장
 var screenWidth80Percent = window.innerWidth * 0.5;
 
-// 숨기고자 하는 타일 ID를 지정하는 배열
-var list = [1, 3, 20, 21, 34, 6, 7];
+// 숨기고자 하는 타일 ID를 지정하는 배열 (초기 값은 빈 배열)
+var list = [];
 
 // 전역 변수 선언
 var user_list = [];
@@ -138,73 +138,84 @@ function formatDate(date) {
 }
 
 // 타일 초기화 함수
-function initializeTiles() {
-  // 타일 컨테이너 가져오기
-  const tileContainer = document.getElementById('tile-container');
+async function initializeTiles() {
+  try {
+    // 서버로부터 숨길 타일 인덱스를 가져옴
+    const response = await fetch(
+      'http://127.0.0.1:8000/commit/board/open/list'
+    );
+    const data = await response.json();
+    list = data.indices; // 서버에서 받은 인덱스를 list에 저장
 
-  // 타일 컨테이너의 너비 설정
-  tileContainer.style.width = screenWidth80Percent + 'px';
+    // 타일 컨테이너 가져오기
+    const tileContainer = document.getElementById('tile-container');
 
-  // 임시 이미지 객체를 만들어 원본 크기를 가져옴
-  const tempImage = new Image();
-  tempImage.src = 'https://picsum.photos/500';
+    // 타일 컨테이너의 너비 설정
+    tileContainer.style.width = screenWidth80Percent + 'px';
 
-  tempImage.onload = function () {
-    // 이미지 로드가 완료된 후에 해상도를 사용하여 높이를 계산
-    const imageWidth = this.naturalWidth;
-    const imageHeight = this.naturalHeight;
-    const imageAspectRatio = imageHeight / imageWidth; // 이미지의 가로:세로 비율 계산
+    // 임시 이미지 객체를 만들어 원본 크기를 가져옴
+    const tempImage = new Image();
+    tempImage.src = 'https://picsum.photos/500';
 
-    // 이미지 비율에 맞게 높이 설정
-    const containerHeight = screenWidth80Percent * imageAspectRatio;
-    tileContainer.style.height = containerHeight + 'px';
+    tempImage.onload = function () {
+      // 이미지 로드가 완료된 후에 해상도를 사용하여 높이를 계산
+      const imageWidth = this.naturalWidth;
+      const imageHeight = this.naturalHeight;
+      const imageAspectRatio = imageHeight / imageWidth; // 이미지의 가로:세로 비율 계산
 
-    for (let i = 1; i <= 35; i++) {
-      const tileContainerElement = document.createElement('div');
+      // 이미지 비율에 맞게 높이 설정
+      const containerHeight = screenWidth80Percent * imageAspectRatio;
+      tileContainer.style.height = containerHeight + 'px';
 
-      if (list.includes(i)) {
-        // list에 있는 ID를 가진 타일은 초록색 타일로 설정
-        tileContainerElement.className = 'tile bg-green-500 rounded-lg';
-      } else {
-        // list에 없는 ID를 가진 타일은 플립 애니메이션 적용
-        tileContainerElement.className = 'flip-container';
+      for (let i = 0; i <= 34; i++) {
+        const tileContainerElement = document.createElement('div');
 
-        const tile = document.createElement('div');
-        tile.style = 'position: relative; width: 100%; height: 100%;';
-        tile.id = 'tile-' + i;
-        tile.className = 'flip-card';
+        if (list.includes(i)) {
+          // list에 있는 ID를 가진 타일은 투명하게 하고 플립 애니메이션 적용
+          tileContainerElement.className = 'flip-container';
 
-        const front = document.createElement('div');
-        front.className = 'flip-card-front';
+          const tile = document.createElement('div');
+          tile.style = 'position: relative; width: 100%; height: 100%;';
+          tile.id = 'tile-' + i;
+          tile.className = 'flip-card';
 
-        const back = document.createElement('div');
-        back.className = 'flip-card-back';
+          const front = document.createElement('div');
+          front.className = 'flip-card-front transparent-tile'; // 투명 타일
 
-        tile.appendChild(front);
-        tile.appendChild(back);
-        tileContainerElement.appendChild(tile);
+          const back = document.createElement('div');
+          back.className = 'flip-card-back';
 
-        // 옵저버로 타일이 보일 때만 애니메이션 실행
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                tile.classList.add('flipped'); // 타일에 플립 클래스 추가
-                observer.unobserve(entry.target); // 애니메이션은 한 번만 실행되도록 옵저버 제거
-              }
-            });
-          },
-          {
-            threshold: 0.5, // 타일이 50% 이상 보일 때 트리거
-          }
-        );
+          tile.appendChild(front);
+          tile.appendChild(back);
+          tileContainerElement.appendChild(tile);
 
-        observer.observe(tileContainerElement);
+          // 옵저버로 타일이 보일 때만 애니메이션 실행
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  tile.classList.add('flipped'); // 타일에 플립 클래스 추가
+                  observer.unobserve(entry.target); // 애니메이션은 한 번만 실행되도록 옵저버 제거
+                }
+              });
+            },
+            {
+              threshold: 0.5, // 타일이 50% 이상 보일 때 트리거
+            }
+          );
+
+          observer.observe(tileContainerElement);
+        } else {
+          // list에 없는 ID를 가진 타일은 초록색 타일로 설정하여 가림
+          tileContainerElement.className = 'tile bg-green-500 rounded-lg';
+        }
+
+        tileContainer.appendChild(tileContainerElement);
       }
-
-      tileContainer.appendChild(tileContainerElement);
-    }
-  };
+    };
+  } catch (error) {
+    console.error('Error initializing tiles:', error);
+  }
 }
 
 // Function to update header links based on the token
@@ -278,10 +289,10 @@ window.onload = async function () {
   document.getElementById('day-display').innerText = calculateDay();
 
   // Initialize tiles after DOM is loaded
-  initializeTiles();
+  await initializeTiles(); // 비동기로 타일 초기화
 
   // Fetch user list and update UI accordingly
-  fetchUserList();
+  await fetchUserList();
 
   //토큰 로직
   let tokenElement = document.getElementById('token');
