@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify
 from repository.dayTotalCommitCountRepository import dayTotalCommitCountRepository
 from repository.userCommitCountRepository import userCommitCountRepository
 from repository.repositoryProfile import profile_repository
+from repository.boardBlockListRepository import boardBlockListRepository
 
 bp = Blueprint('commit', __name__)
 
@@ -32,5 +33,12 @@ def commitTotalCount():
 
 @bp.route('/commit/board/open/list')
 def commitOpenList():
+    item = boardBlockListRepository.todayOpenList()
+    if item:
+        result = {
+            "indices": item.openList
+        }
+        return jsonify(result)
+    else:
+        return []
 
-    return
