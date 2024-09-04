@@ -45,8 +45,6 @@ def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
     print(code)
-    if code is None:
-        return redirect('/signup/redirect')
     return render_template('signup.html',code=code)
        
         
@@ -108,13 +106,6 @@ def signupUpdate():
     accessToken = jwt.encode(payload, secret_key, algorithm=algo)
     refreshToken = jwt.encode(payload, secret_key, algorithm=algo)
 
-    # main 화면에 전달 
-    key = hashlib.sha256(accessToken.encode()).hexdigest()
-    clientInfo = {
-        'access_token': accessToken
-    }
-    inMemoryCacheInstance.set(key, clientInfo)
- 
     # tokentable에 token정보 추가
     tokentable = TokenTable(
         userId = user_id,
@@ -128,6 +119,13 @@ def signupUpdate():
 
     # count batch refresh 
     # CommitCountScheduler().job()
+
+     # main 화면에 전달 
+    key = hashlib.sha256(accessToken.encode()).hexdigest()
+    clientInfo = {
+        'access_token': accessToken
+    }
+    inMemoryCacheInstance.set(key, clientInfo)
 
     return redirect(f'/main?code={key}')
 
