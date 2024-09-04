@@ -102,7 +102,7 @@ def signupUpdate():
     )
     created_user = profile_repository.create(usertable) 
     user_id = created_user._id
-    print(f"생성된 유저의 _id: {user_id}")
+    print("생성된 유저의 _id: {user_id}")
  
     # jwt 토큰 발급
     payload = {"userId": user_id}
@@ -122,7 +122,7 @@ def signupUpdate():
         createdat = datetime.now()
     )
     created_token = token_repository.create(tokentable) 
-    print(f"생성된 유저의 userId: {created_token.userId}")    
+    print("생성된 유저의 userId: {created_token.userId}")    
 
     # count batch refresh 
     # CommitCountScheduler().job()

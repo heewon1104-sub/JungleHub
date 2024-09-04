@@ -24,6 +24,17 @@ var commit_user = [
   'Test account18',
 ];
 
+var user_list = [
+  { id: 1, name: 'User1' },
+  { id: 2, name: 'User2' },
+  { id: 3, name: 'User3' },
+  { id: 4, name: 'User4' },
+  { id: 5, name: 'User5' },
+  { id: 6, name: 'User6' },
+  { id: 7, name: 'User7' },
+  { id: 8, name: 'User8' },
+];
+
 let isFirstAnimationPlaying = false;
 
 function createObserver() {
@@ -140,10 +151,10 @@ window.onload = function () {
   const contributorsContainer = document.getElementById('contributors');
 
   // 반복문을 통해 기여자 요소 생성 및 추가
-  commit_user.forEach((user, index) => {
+  user_list.forEach((user) => {
     const span = document.createElement('span');
     span.className = 'text-green-500';
-    span.textContent = user;
+    span.textContent = user.name; // 'name' 속성만 사용
     contributorsContainer.appendChild(span);
   });
 
@@ -223,8 +234,6 @@ function initializeTiles() {
     let tokenElement = document.getElementById('token');
     let tokenValue = tokenElement.value;
 
-    console.log(tokenValue)
-
     if (tokenValue == '' || tokenValue == null) {
       if (localStorage.getItem('key') == null) {
         localStorage.setItem('key', null);
@@ -235,6 +244,8 @@ function initializeTiles() {
       localStorage.setItem('key', tokenObject.access_token);
     }
 
+    console.log('Bearer ' + localStorage.getItem('key'));
+
     updateHeaderLinks();
   };
 }
@@ -244,12 +255,8 @@ function updateHeaderLinks() {
   const authLinksContainer = document.getElementById('auth-links');
   const token = localStorage.getItem('key');
 
-  console.log('KEY : ', token);
-
   if (token === 'null' || token === null) {
     authLinksContainer.innerHTML = `
-      <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
-      <span class="mx-2">|</span>
       <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
     `;
   } else {
