@@ -14,7 +14,6 @@ def main():
     clientInfo = inMemoryCacheInstance.get(code)
     inMemoryCacheInstance.delete(code)
 
-    print("💩")
     print(clientInfo)
 
     if clientInfo is not None: 
