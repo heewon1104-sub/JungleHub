@@ -1,5 +1,5 @@
 from bson import ObjectId
-from repository.repositoryConfig import client
+from repository.repositoryConfig import client, RepositoryConfig
 
 class UserTable:
     def __init__(self, 
@@ -42,10 +42,13 @@ class UserTable:
 
 
 class ProfileRepository:
+
+    COLLECTION_NAME = 'user'
+
     def __init__(self, client):
         self.client = client
-        self.db = client['dbjungle']
-        self.collection = self.db['user']
+        self.db = client[RepositoryConfig.databaseName]
+        self.collection = self.db[self.COLLECTION_NAME]
 
     # 새 유저 테이블 생성 함수
     def create(self, usertable):

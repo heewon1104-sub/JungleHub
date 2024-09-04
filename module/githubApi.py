@@ -3,13 +3,16 @@ import json
 from datetime import datetime, timedelta, timezone
 from configuration.config import Config
 from urllib.parse import parse_qs
+import aiohttp
+import asyncio
 
-    
+
 class GithubApi:
 
     def __init__(self):
         self.graphqlUrl = "https://api.github.com/graphql"
-        self.restUrl = "https://github.com"
+        self.githubUrl = "https://github.com"
+        self.restAPIUrl = "https://api.github.com"
         config = Config()
         self.clientId = config.find("GITHUB_CLIENT_ID")
         self.clientKey = config.find("GITHUB_CLIENT_SECRET")
@@ -30,10 +33,8 @@ class GithubApi:
             "client_secret": self.clientKey,
         })
 
-        response = requests.post(self.restUrl + "/login/oauth/access_token", headers=headers, data=data)
+        response = requests.post(self.githubUrl + "/login/oauth/access_token", headers=headers, data=data)
 
-        # 결과 출력
-        print("🍎🍎🍎🍎🍎🍎🍎🍎🍎")
         if response.status_code == 200:
             resultText = response.text
             parsedQuery = parse_qs(resultText)
@@ -41,8 +42,23 @@ class GithubApi:
         else:
             print(response.text)
 
+    def getUserInfo(self, githubAccessToken, githubId):
+        headers = {
+            "Authorization": f"bearer {githubAccessToken}"
+        }
 
-    def getTotalCommitCountToday(self):
+        response = requests.get(self.restAPIUrl + f"/users/{githubId}", headers=headers)
+
+        if response.status_code == 200:
+            jsonResult = json.loads(response.text)
+            print(jsonResult['login'])
+            print(jsonResult['name'])
+            print(jsonResult['email'])
+            return jsonResult
+        else:
+            print(response.text)
+
+    def getTotalCommitCountToday(self, loginId, accessToken):
 
         def koreaNowDatetime():
             KST = timezone(timedelta(hours=9))
@@ -63,31 +79,25 @@ class GithubApi:
             return formatted_time
 
         fromDatetime = koreaNowDatetime()
-        toDatetime = koreaNextDatetime()
+        toDatetime = koreaNextDatetime(fromDatetime)
 
-        return self.getTotalCommitCount(dateTimeToKSTString(fromDatetime), dateTimeToKSTString(toDatetime))
-
+        return self.getTotalCommitCount(
+            loginId=loginId, 
+            accessToken=accessToken, 
+            fromDatetime=dateTimeToKSTString(fromDatetime), 
+            toDatetime=dateTimeToKSTString(toDatetime)
+        )
+    
 
     # from, to를 date 타입으로 받아서, 아래 형태로 바꿔서 query 날리기
     def getTotalCommitCount(self, loginId, accessToken, fromDatetime, toDatetime):
-
-        query = f"""
-        query {{
-            user(login: "{loginId}") {{
-                contributionsCollection(from: "{fromDatetime}", to: "{toDatetime}") {{
-                    totalCommitContributions
-                }}
-            }}
-        }}
-        """
-        headers = {
-            "Authorization": f"Bearer {accessToken}",
-            "Content-Type": "application/json"
-        }
-
+        query = self.getTotalCommitCountQuery(loginId, fromDatetime=fromDatetime, toDatetime=toDatetime)
+        headers = self.getTotalCommitCountHeader(accessToken)
         data = json.dumps({"query": query})
-
+        
         response = requests.post(self.graphqlUrl, headers=headers, data=data)
+
+        print(response.status_code)
 
         # 결과 출력
         if response.status_code == 200:
@@ -100,5 +110,86 @@ class GithubApi:
             print(response.text)
 
         return total_commit_contributions
+    
+    def getTotalCommitCountQuery(self, loginId, fromDatetime, toDatetime):
+        return f"""
+        query {{
+            user(login: "{loginId}") {{
+                contributionsCollection(from: "{fromDatetime}", to: "{toDatetime}") {{
+                    totalCommitContributions
+                }}
+            }}
+        }}
+        """
+
+    def getTotalCommitCountHeader(self, accessToken):
+        return {
+            "Authorization": f"Bearer {accessToken}",
+            "Content-Type": "application/json"
+        }
+
+    async def getDataAsync(self, url, data, headers):
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=data, headers=headers) as response:
+                if response.status == 200:
+                    # JSON 응답인 경우
+                    body = await response.json()
+                    return body
+                else:
+                    # 오류 응답인 경우
+                    error_message = await response.text()
+                    print(f"Error: {response.status}, Message: {error_message}")
+                    return None
+    
+
+    async def getTotalCommitCountTodayAsync(self, loginId, accessToken, userId):
+
+        def nowDatetime():
+            # 한국시간 기준, +6 기준으로 업데이트 하기 때문에 아래와 같이 +6을 함 
+            ourZone = timezone(timedelta(hours=9+6))
+            return datetime.now(ourZone)
+
+        def nextDatetime(now):
+            tomorrow = now + timedelta(days=1)
+            return tomorrow
+
+        def dateTimeToKSTString(date):
+            formatted_time = date.strftime('%Y-%m-%dT%H:%M:%S%z')
+            formatted_time = formatted_time[:-2] + ':' + formatted_time[-2:]
+            return formatted_time
+
+        fromDatetime = nowDatetime()
+        toDatetime = nextDatetime(fromDatetime)
+
+        return await self.getTotalCommitCountAsync(
+            loginId=loginId, 
+            accessToken=accessToken, 
+            userId = userId,
+            fromDatetime=dateTimeToKSTString(fromDatetime), 
+            toDatetime=dateTimeToKSTString(toDatetime)
+        )
+
+
+    async def getTotalCommitCountAsync(self, loginId, accessToken, userId, fromDatetime, toDatetime):
+        query = self.getTotalCommitCountQuery(loginId, fromDatetime=fromDatetime, toDatetime=toDatetime)
+        headers = self.getTotalCommitCountHeader(accessToken)
+        data = json.dumps({"query": query})
+        
+        response = await self.getDataAsync(url=self.graphqlUrl, data=data, headers=headers)
+
+        return {
+            "userId": userId,
+            "totalCommitCount": response['data']['user']['contributionsCollection']['totalCommitContributions']
+        }
+
+    async def requestGetAllTotalCommitCount(self, list):
+        tasks = [ self.getTotalCommitCountTodayAsync(item['loginId'], item['accessToken'], item['userId']) for item in list]
+        responses = await asyncio.gather(*tasks)
+        return responses
+
+    def getAllTotalCommitCount(self, list):
+        responses = asyncio.run(self.requestGetAllTotalCommitCount(list))
+        return responses
+        
 
 

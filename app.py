@@ -2,6 +2,12 @@ from flask import Flask
 from controller import main, login, user_profile, signup
 import os
 
+from batch.CommitCountScheduler import CommitCountScheduler
+
+# 배포전 실행 
+# CommitCountScheduler().run()
+
+
 app = Flask(__name__)
 
 # 런타임 에러 방지
