@@ -1,5 +1,6 @@
 from flask import Flask
 from controller import main, login, user_profile, signup, commit
+from flask_cors import CORS
 
 from batch.CommitCountScheduler import CommitCountScheduler
 
@@ -7,6 +8,8 @@ from batch.CommitCountScheduler import CommitCountScheduler
 CommitCountScheduler().job()
 
 app = Flask(__name__)
+
+CORS(app)
 
 # 블루프린트 등록 
 app.register_blueprint(main.bp)
