@@ -39,7 +39,7 @@ def signupComplete():
     # JWT를 clientInfo의 access_token에 할당
 
     clientInfo = {
-        'access_token': 'access 토큰 입니다.'
+        "access_token": "access 토큰 입니다."
     }
 
     session['clientInfo'] = clientInfo
