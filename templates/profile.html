@@ -100,7 +100,7 @@
                         </div>
                         <div class="profile-bio">${user.bio}</div>
                         <div class="profile-contributions">누적 기여 수: ${user.commit}</div>
-                        <button class="btn" onclick="window.location.href='/profile1/modifi'">수정하기</button>
+                        <button class="btn" style="visibility: hidden;" onclick="window.location.href='/profile1/modifi'">수정하기</button>
                     `);
                 },
                 error: function (xhr, status, error) {
