@@ -40,6 +40,9 @@ def signupComplete():
     # JWT 만들기 - 뭐 들어갈지도 정해야 함. 
     # JWT를 clientInfo의 access_token에 할당
 
+    clientInfo = {
+        'access_token': 'access 토큰 입니다.'
+    }
 
     # main 화면에서 사용할 client 정보.
     clientInfo = { 'access_token': 'access 토큰 입니다.' }
