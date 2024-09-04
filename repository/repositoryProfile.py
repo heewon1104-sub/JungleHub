@@ -2,7 +2,23 @@ from bson import ObjectId
 from repository.repositoryConfig import client
 
 class UserTable:
-    def __init__(self, _id, id, password, pic_url, generation, num, name, like, git=None, commit=None, bio=None):
+    def __init__(self, 
+                 _id, 
+                 id, 
+                 password, 
+                 pic_url, 
+                 generation, 
+                 num, 
+                 name, 
+                 like, 
+                 githubaccesstoken, 
+                 accesstoken, 
+                 refreshtoken, 
+                 updateat, 
+                 createdat, 
+                 git=None, 
+                 commit=None, 
+                 bio=None):
         self._id = _id
         self.id = id
         self.password = password
@@ -14,15 +30,22 @@ class UserTable:
         self.git = git
         self.commit = commit
         self.bio = bio
-
+        self.githubaccesstoken = githubaccesstoken
+        self.accesstoken = accesstoken
+        self.refreshtoken = refreshtoken
+        self.updateat = updateat
+        self.createdat = createdat
+     
     def __repr__(self):
         return f"<UserTable(id={self.id}, name={self.name}, generation={self.generation})>"
+    
+
 
 class ProfileRepository:
     def __init__(self, client):
         self.client = client
         self.db = client['dbjungle']
-        self.collection = self.db['usertable']
+        self.collection = self.db['user']
 
     # 새 유저 테이블 생성 함수
     def create(self, usertable):
@@ -36,7 +59,12 @@ class ProfileRepository:
             "like": usertable.like,
             "git": usertable.git,
             "commit": usertable.commit,
-            "bio": usertable.bio,
+            "bio": usertable.bio,           # 자기소개
+            "githubaccesstoken":usertable.githubaccesstoken,
+            "accesstoken":usertable.accesstoken,
+            "refreshtoken":usertable.refreshtoken,
+            "updateat":usertable.updateat,
+            "createdat":usertable.createdat
         }
         result = self.collection.insert_one(data)
         usertable._id = str(result.inserted_id)  # MongoDB의 ObjectId를 문자열로 저장
