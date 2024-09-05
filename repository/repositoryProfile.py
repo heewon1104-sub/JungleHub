@@ -308,7 +308,7 @@ class TokenRepository:
         return accesstokenList
 
     def read_all_token(self, user_id):
-        data = self.collection.find_one({'userId': user_id})
+        data = self.collection.find_one({'userId': str(user_id)})
         if data:
             tokentable = TokenTable(
                 userId=data['userId'],
