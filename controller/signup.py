@@ -141,7 +141,7 @@ def signupUpdate():
     print("생성된 유저의 userId: {created_token.userId}")    
 
     # count batch refresh 
-    # CommitCountScheduler().job()
+    CommitCountScheduler().job()
 
      # main 화면에 전달 
     key = hashlib.sha256(accessToken.encode()).hexdigest()
