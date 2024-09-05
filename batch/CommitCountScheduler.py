@@ -58,7 +58,9 @@ class CommitCountScheduler:
         for i in range(0,35):
             allIndices.append(i)
 
-        totalBlockCount = 35
+        CONSTANT = 3
+
+        totalBlockCount = 35 * CONSTANT
         openRate = totalCommitCount / totalBlockCount
         if openRate > 1:
             openRate = 1
