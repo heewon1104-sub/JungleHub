@@ -42,10 +42,17 @@ class CommitCountScheduler:
         # userId, totalCommitCount
         resultList = self.api.getAllTotalCommitCount(list=userList)
 
-        # dayTotalCommitCount 업데이트 
-        totalCommitCount = sum([ item['totalCommitCount'] for item in resultList])
+        # 모든 유저의 오늘 커밋 수
+        todayTotalCommitCount = sum([ item['totalCommitCount'] for item in resultList])
+
+        # 어제 까지의 누적값
+        lastCumulativeCount = dayTotalCommitCountRepository.lastDayCumulative()
+
+        # 오늘의 누적값
+        cumulativeCount = lastCumulativeCount + todayTotalCommitCount
+        
         currentDayKey = DayTotalCommitCount.makeCurrentDayKey()
-        newTotalCommitCount = DayTotalCommitCount(currentDayKey, totalCommitCount)
+        newTotalCommitCount = DayTotalCommitCount(currentDayKey, count=todayTotalCommitCount, cumulativeCount=cumulativeCount)
         dayTotalCommitCountRepository.update(newTotalCommitCount)
 
         # user count 업데이트
@@ -61,7 +68,7 @@ class CommitCountScheduler:
         CONSTANT=3
 
         totalBlockCount = 35
-        openRate = (totalCommitCount / CONSTANT) / totalBlockCount 
+        openRate = (todayTotalCommitCount / CONSTANT) / totalBlockCount 
         if openRate > 1:
             openRate = 1
 
