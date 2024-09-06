@@ -16,9 +16,21 @@ def commitUserList():
     for today in todayCommitUserList:
         for user in userList:
             if user._id == today.userKey:
-                list.append(user)
+                list.append(
+                    {
+                        'user': user,
+                        'count': today.count
+                    }
+                )
+    list.sort(key=lambda item: (-item['count'], item['user'].id))
     result = {
-        "userList": [ { "name": a.id + f'({a.gitId})', "id": a._id  } for a in list]
+        "userList": [ 
+            { 
+                "name": f'{item["user"].id}({item["user"].gitId}, {item["count"]})', 
+                "id": item["user"]._id  
+            } 
+            for item in list
+        ]
     }
     return jsonify(result)
 
