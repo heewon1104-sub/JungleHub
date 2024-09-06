@@ -23,21 +23,29 @@ class DayTotalCommitCountRepository:
             list.append(item)
         return list;
 
-    def todayCount(self):
-        current = datetime.now(timezone(timedelta(hours=9-6)))
-        year = current.year
-        month = current.month
-        day = current.day
-        key = f"{year}-{month}-{day}"
-
-        list = []
+    def todayCumulative(self):
+        # 오늘의 누적값 넣어줄 때 이전 날꺼 누적값을 반환
+        currentDay = datetime.now(timezone(timedelta(hours=9-6))) 
+        key = self.makeKey(currentDay)
         for data in self.collection.find():
-            item = DayTotalCommitCount.from_dict(data)
-            if item._id == key:
-                list.append(item)
+            if data.get('_id') == key:
+                return data.get('cumulativeCount')
+        return 0
 
-        totalCommitCount = sum([ item.count for item in list])
-        return totalCommitCount;
+    def lastDayCumulative(self):
+        # 오늘의 누적값 넣어줄 때 이전 날꺼 누적값을 반환
+        lastDay = datetime.now(timezone(timedelta(hours=9-6-24))) 
+        key = self.makeKey(lastDay)
+        for data in self.collection.find():
+            if data.get('_id') == key:
+                return data.get('cumulativeCount')
+        return 0
+
+    def makeKey(self, daytime):
+        year = daytime.year
+        month = daytime.month
+        day = daytime.day
+        return f"{year}-{month}-{day}"
 
     def update(self, newModel):
         self.collection.update_one(

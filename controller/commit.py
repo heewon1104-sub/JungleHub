@@ -24,7 +24,7 @@ def commitUserList():
 
 @bp.route('/commit/total-count')
 def commitTotalCount():
-    count = dayTotalCommitCountRepository.todayCount()
+    count = dayTotalCommitCountRepository.todayCumulative()
     result = {
         "commitTotalCount": count
     }
