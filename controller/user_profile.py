@@ -23,8 +23,6 @@ def profile():
     token = access_token.split("Bearer ")[-1]
     print(token)
 
-
-
     accesstokenList = token_repository.read_all_accesstoken()
 
      # 토큰 유효성 검증
@@ -48,14 +46,7 @@ def profile():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
     
-
-
-       
-
-
-
-
-
+    
 
 @bp.route('/profile', methods=['GET'])  # 프로필
 def profile_test():
