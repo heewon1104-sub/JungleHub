@@ -10,12 +10,18 @@ class DayTotalCommitCount:
         day = current.day
         return f"{year}-{month}-{day}"
 
-    def __init__(self, _id, count=0, cumulativeCount = 0,updatedAt=datetime.now(timezone.utc), createdAt=datetime.now(timezone.utc)):
+    def __init__(self, _id, count=0, cumulativeCount = 0,updatedAt=None, createdAt=None):
         self._id = _id
         self.count = count
         self.cumulativeCount = cumulativeCount
-        self.updatedAt = updatedAt
-        self.createdAt = createdAt
+        if updatedAt:
+            self.updatedAt = updatedAt
+        else:
+            self.updatedAt = datetime.now(timezone.utc)
+        if createdAt:
+            self.createdAt = createdAt
+        else:
+            self.createdAt = datetime.now(timezone.utc)
     
     def to_dict(self):
         return {

@@ -18,6 +18,31 @@ bp = Blueprint('signup', __name__)
 
 githubApi = GithubApi()
 
+@bp.route("/singout")
+def signout():
+
+    access_token = request.headers.get('Authorization')
+    if not access_token:
+        return "Access token is missing or invalid", 400
+    token = access_token.split("Bearer ")[-1]
+    
+    print(token)
+
+    accesstokenList = token_repository.read_all_accesstoken()
+
+    try:
+        # 데이터베이스에서 해당 유저의 accesstoken을 조회하여 비교
+        for token_entry in accesstokenList:
+            if token_entry.accesstoken == token:
+                userId = token_entry.userId
+                token_repository.delete(accessToken=token)
+                profile_repository.delete(userKey=userId)
+    except Exception as error:
+        print(error)
+        return 'fail: ' + error
+    
+    return 'ok'
+
 @bp.route("/signup/redirect")  
 def singupRedirect():
     githubLoginUrl = githubApi.getLoginUrl()
@@ -33,6 +58,7 @@ def signupComplete():
 
         githubUserInfo = githubApi.getUserInfo(githubAccessToken=githubAccessToken)
 
+    
         if githubUserInfo is not None:  
             git = githubUserInfo['html_url']
 
@@ -57,8 +83,13 @@ def signupComplete():
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
         key = hashlib.sha256(githubAccessToken.encode()).hexdigest()
         inMemoryCacheInstance.set(key, githubAccessToken)
+
+        # 유저의 Git 아읻, 이름, 프로필 사진 URL을 가져옵니다 
+        userGitID = githubUserInfo['login']
+        userGitName = githubUserInfo['name']
+        userGitPic_url = githubUserInfo['avatar_url']
         # 이후 signup.html 페이지로 리다이렉트합니다.
-        return redirect(f'/signup?code={key}')
+        return redirect(f'/signup?code={key}&userGitID={userGitID}&userGitName={userGitName}&userGitPic_url={userGitPic_url}')
     else:
         return "GitHub 인증 실패", 400
 
@@ -67,8 +98,13 @@ def signupComplete():
 def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
+
+    githubId = request.args.get('code')
+    githubNickname = request.args.get('code')
+    githubEmail = request.args.get('code')
+
     print(code)
-    return render_template('signup.html',code=code)
+    return render_template('signup.html',code=code, githubId=githubId, githubNickname=githubNickname, githubEmail= githubEmail) 
        
         
 @bp.route("/signup/update", methods=['POST'])
@@ -79,8 +115,7 @@ def signupUpdate():
     print(code)
 
     id = request.form['id']
-    password = request.form['password']
-    passwordconfirm = request.form['password-confirm']
+    nickname = request.form['nickname']
     cardinal = request.form['cardinal']
     number = request.form['number']
     intro = request.form['intro']
@@ -105,7 +140,7 @@ def signupUpdate():
     usertable = UserTable(
         _id=None,  # MongoDB에서 자동 생성되므로 None으로 설정
         id = id,
-        password = password,
+        nickname = nickname,
         pic_url=pic_url,
         generation=cardinal,
         num=number,
