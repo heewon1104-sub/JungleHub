@@ -152,7 +152,7 @@ def signupUpdate():
         gitId = githubUserInfo['login']
 
         # 중복 회원 처리 
-        if profile_repository.read_git_id(git) == git:
+        if profile_repository.read_git_id(gitId) == gitId:
             return redirect(f'/signup/fail?message=aleady')
 
     # 입력받은 데이터를 usertable DB에 저장

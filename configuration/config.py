@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import socket
 
 
 class Config:
@@ -10,7 +9,10 @@ class Config:
         return self.root.find(f"string[@name='{key}']").text
     
     def getHost(self):
-        return "127.0.0.1"
+        if self.isDev():
+            return "127.0.0.1"
+        else: 
+            return "0.0.0.0"
 
     
     def getPort(self):
@@ -20,8 +22,8 @@ class Config:
             return "5000"
     
     def isDev(self):
-        return False
-        # return True
+        secretKey = self.find("DEPLOYMENT_ENVIRONMENT")
+        return secretKey != "PROD"
     
 
 ''' 사용법 
