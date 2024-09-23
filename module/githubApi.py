@@ -105,6 +105,10 @@ class GithubApi:
         # 결과 출력
         if response.status_code == 200:
             result = response.json()  # 응답을 JSON으로 파싱
+
+            if not result or not result['data'] or not result['data'] or not result['data']['contributionsCollection'] or not result['data']['contributionsCollection']['totalCommitContributions']:
+                return 0
+
             try:
                 total_commit_contributions = result['data']['user']['contributionsCollection']['totalCommitContributions']
             except KeyError:
@@ -150,7 +154,7 @@ class GithubApi:
         def nowDatetime():
             # 한국시간 기준, +6 기준으로 업데이트 하기 때문에 아래와 같이 -6을 함 
             ourZone = timezone(timedelta(hours=9-6))
-            return datetime.now(ourZone)
+            return datetime.now(ourZone).replace(hour=0, minute=0, second=0, microsecond=0)
 
         def nextDatetime(now):
             tomorrow = now + timedelta(days=1)
