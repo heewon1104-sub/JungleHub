@@ -206,10 +206,12 @@ class ProfileRepository:
             return result
         return None
     
-     # 모든 유저의 정보를 삭제하는 함수
-    def delete_all_users(self):
-        result = self.collection.delete_many({})
-        return result.deleted_count  # 삭제된 문서 수 반환
+    def delete(self, _id):
+        if isinstance(_id) is not ObjectId:
+            _id = ObjectId(_id)
+        self.collection.delete_one(
+            { '_id': _id }
+        )
 
 profile_repository = ProfileRepository(client)
 
@@ -236,6 +238,13 @@ class TokenRepository:
         self.client = client
         self.db = client['dbjungle']
         self.collection = self.db['token']
+
+    def delete(self, _id):
+        if isinstance(_id) is not ObjectId:
+            _id = ObjectId(_id)
+        self.collection.delete_one(
+            { '_id': _id }
+        )
 
     # 새 유저 테이블 생성 함수
     def create(self, tokentable):
@@ -287,7 +296,6 @@ class TokenRepository:
             junglerList.append(tokentable)
 
         return junglerList
-
 
 
     # 데이터베이스의 모든 유저의 _id, accesstoken 알아오는 함수
