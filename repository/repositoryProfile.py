@@ -155,10 +155,10 @@ class ProfileRepository:
             return data['bio']
         return None
     
-    def read_git(self, git):
-        data = self.collection.find_one({ 'git': git })
+    def read_git_id(self, gitId):
+        data = self.collection.find_one({ 'gitId': gitId })
         if data:
-            return data['git']
+            return data['gitId']
         return None
     
     def read_git_user(self, git):

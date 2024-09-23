@@ -20,7 +20,8 @@ class Config:
             return "5000"
     
     def isDev(self):
-        return socket.gethostbyname(socket.gethostname()) == "127.0.0.1"
+        return True
+        # return False
     
 
 ''' 사용법 
