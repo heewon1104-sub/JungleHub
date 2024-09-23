@@ -20,8 +20,8 @@ class Config:
             return "5000"
     
     def isDev(self):
-        return True
-        # return False
+        return False
+        # return True
     
 
 ''' 사용법 

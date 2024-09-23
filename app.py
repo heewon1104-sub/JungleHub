@@ -26,4 +26,4 @@ if __name__ == '__main__':
     host = config.getHost()
     port = config.getPort()
     debug = config.isDev()
-    app.run(host=host, port=port, debug = debug)
+    app.run(host=host, port=port, debug=debug)
