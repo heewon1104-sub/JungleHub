@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import socket
 
 
 class Config:
@@ -20,8 +19,8 @@ class Config:
             return "5000"
     
     def isDev(self):
-        return False
-        # return True
+        secretKey = self.find("DEPLOYMENT_ENVIRONMENT")
+        return secretKey != "PROD"
     
 
 ''' 사용법 
