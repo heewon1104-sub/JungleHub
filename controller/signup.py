@@ -81,15 +81,26 @@ def signupComplete():
                     return redirect('/main')
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
-        key = hashlib.sha256(githubAccessToken.encode()).hexdigest()
-        inMemoryCacheInstance.set(key, githubAccessToken)
+        codeKey = hashlib.sha256(githubAccessToken.encode()).hexdigest()
+        inMemoryCacheInstance.set(codeKey, githubAccessToken)
 
-        # 유저의 Git 아읻, 이름, 프로필 사진 URL을 가져옵니다 
+        # 유저의 Git Id, 이름, 프로필 사진 URL, git URL을 가져옵니다 
         userGitID = githubUserInfo['login']
         userGitName = githubUserInfo['name']
-        userGitPic_url = githubUserInfo['avatar_url']
-        # 이후 signup.html 페이지로 리다이렉트합니다.
-        return redirect(f'/signup?code={key}&userGitID={userGitID}&userGitName={userGitName}&userGitPic_url={userGitPic_url}')
+        userGitPicURL = githubUserInfo['avatar_url']
+        userGitURL = githubUserInfo['html_url']
+
+        redirectUrl = f'/signup?code={codeKey}'
+        if userGitID:
+            redirectUrl += f'&userGitID={userGitID}'
+        if userGitName:
+            redirectUrl += f'&userGitName={userGitName}'
+        if userGitPicURL:
+            redirectUrl += f'&userGitPicURL={userGitPicURL}'
+        if git:
+            redirectUrl += f'&userGitURL={userGitURL}'
+
+        return redirect(redirectUrl) # 이후 signup.html 페이지로 리다이렉트합니다.
     else:
         return "GitHub 인증 실패", 400
 
@@ -98,14 +109,21 @@ def signupComplete():
 def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
-
-    githubId = request.args.get('code')
-    githubNickname = request.args.get('code')
-    githubEmail = request.args.get('code')
-
     print(code)
-    return render_template('signup.html',code=code, githubId=githubId, githubNickname=githubNickname, githubEmail= githubEmail) 
-       
+
+    githubId = request.args.get('userGitID')
+    githubNickname = request.args.get('userGitName')
+    picEmail = request.args.get('userGitPicURL')
+    githubEmail = request.args.get('userGitURL')
+
+    return render_template(
+        'signup.html',
+        code=code, 
+        githubId=githubId, 
+        githubNickname=githubNickname, 
+        picEmail=picEmail, 
+        githubEmail= githubEmail
+    )
         
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
@@ -126,14 +144,15 @@ def signupUpdate():
     name = ""
     git = ""
     gitId = ""
+
     if githubUserInfo is not None:
         pic_url = githubUserInfo['avatar_url']
         name = githubUserInfo['name']
         git = githubUserInfo['html_url']
         gitId = githubUserInfo['login']
 
-        if profile_repository.read_git(git) == git:
-            # git 로 검색해서 있으면 중복 처리
+        # 중복 회원 처리 
+        if profile_repository.read_git_id(git) == git:
             return redirect(f'/signup/fail?message=aleady')
 
     # 입력받은 데이터를 usertable DB에 저장
