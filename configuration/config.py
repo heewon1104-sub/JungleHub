@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import socket
 
 
 class Config:
@@ -7,6 +8,19 @@ class Config:
 
     def find(self, key): 
         return self.root.find(f"string[@name='{key}']").text
+    
+    def getHost(self):
+        return "127.0.0.1"
+
+    
+    def getPort(self):
+        if self.isDev():
+            return "8000"
+        else:
+            return "5000"
+    
+    def isDev(self):
+        return socket.gethostbyname(socket.gethostname()) == "127.0.0.1"
     
 
 ''' 사용법 

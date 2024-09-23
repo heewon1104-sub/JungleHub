@@ -5,7 +5,6 @@ from configuration.config import Config
 from urllib.parse import parse_qs
 import aiohttp
 import asyncio
-import socket
 
 
 class GithubApi:
@@ -15,9 +14,8 @@ class GithubApi:
         self.githubUrl = "https://github.com"
         self.restAPIUrl = "https://api.github.com"
         config = Config()
-        
-        print("Host : ", socket.gethostbyname(socket.gethostname()))
-        if(socket.gethostbyname(socket.gethostname()) == "127.0.0.1"):
+
+        if config.isDev():
             self.clientId = config.find("GITHUB_CLIENT_ID_DEV")
             self.clientKey = config.find("GITHUB_CLIENT_SECRET_DEV")
         else:
