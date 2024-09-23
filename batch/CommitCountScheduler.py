@@ -24,7 +24,7 @@ class CommitCountScheduler:
 
     def getIntervalSeconds(self):
         oneMinute = 60
-        return oneMinute * 10
+        return oneMinute * 30 
 
     def job(self):
 

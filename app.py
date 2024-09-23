@@ -2,10 +2,7 @@ from flask import Flask
 from controller import main, login, user_profile, signup, commit
 from flask_cors import CORS
 from configuration.config import Config
-
 from batch.CommitCountScheduler import CommitCountScheduler
-
-# TODO: 환경 분리 
 
 config = Config()
 
