@@ -18,6 +18,31 @@ bp = Blueprint('signup', __name__)
 
 githubApi = GithubApi()
 
+@bp.route("/singout")
+def signout():
+
+    access_token = request.headers.get('Authorization')
+    if not access_token:
+        return "Access token is missing or invalid", 400
+    token = access_token.split("Bearer ")[-1]
+    
+    print(token)
+
+    accesstokenList = token_repository.read_all_accesstoken()
+
+    try:
+        # 데이터베이스에서 해당 유저의 accesstoken을 조회하여 비교
+        for token_entry in accesstokenList:
+            if token_entry.accesstoken == token:
+                userId = token_entry.userId
+                token_repository.delete(accessToken=token)
+                profile_repository.delete(userKey=userId)
+    except Exception as error:
+        print(error)
+        return 'fail: ' + error
+    
+    return 'ok'
+
 @bp.route("/signup/redirect")  
 def singupRedirect():
     githubLoginUrl = githubApi.getLoginUrl()
@@ -33,6 +58,7 @@ def signupComplete():
 
         githubUserInfo = githubApi.getUserInfo(githubAccessToken=githubAccessToken)
 
+    
         if githubUserInfo is not None:  
             git = githubUserInfo['html_url']
 
@@ -55,10 +81,26 @@ def signupComplete():
                     return redirect('/main')
 
         # GitHub로부터 받은 access token을 세션에 저장하거나, 필요한 처리를 합니다.
-        key = hashlib.sha256(githubAccessToken.encode()).hexdigest()
-        inMemoryCacheInstance.set(key, githubAccessToken)
-        # 이후 signup.html 페이지로 리다이렉트합니다.
-        return redirect(f'/signup?code={key}')
+        codeKey = hashlib.sha256(githubAccessToken.encode()).hexdigest()
+        inMemoryCacheInstance.set(codeKey, githubAccessToken)
+
+        # 유저의 Git Id, 이름, 프로필 사진 URL, git URL을 가져옵니다 
+        userGitID = githubUserInfo['login']
+        userGitName = githubUserInfo['name']
+        userGitPicURL = githubUserInfo['avatar_url']
+        userGitURL = githubUserInfo['html_url']
+
+        redirectUrl = f'/signup?code={codeKey}'
+        if userGitID:
+            redirectUrl += f'&userGitID={userGitID}'
+        if userGitName:
+            redirectUrl += f'&userGitName={userGitName}'
+        if userGitPicURL:
+            redirectUrl += f'&userGitPicURL={userGitPicURL}'
+        if git:
+            redirectUrl += f'&userGitURL={userGitURL}'
+
+        return redirect(redirectUrl) # 이후 signup.html 페이지로 리다이렉트합니다.
     else:
         return "GitHub 인증 실패", 400
 
@@ -68,8 +110,20 @@ def signup():
     # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
     print(code)
-    return render_template('signup.html',code=code)
-       
+
+    githubId = request.args.get('userGitID')
+    githubNickname = request.args.get('userGitName')
+    picEmail = request.args.get('userGitPicURL')
+    githubEmail = request.args.get('userGitURL')
+
+    return render_template(
+        'signup.html',
+        code=code, 
+        githubId=githubId, 
+        githubNickname=githubNickname, 
+        picEmail=picEmail, 
+        githubEmail= githubEmail
+    )
         
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
@@ -79,8 +133,7 @@ def signupUpdate():
     print(code)
 
     id = request.form['id']
-    password = request.form['password']
-    passwordconfirm = request.form['password-confirm']
+    nickname = request.form['nickname']
     cardinal = request.form['cardinal']
     number = request.form['number']
     intro = request.form['intro']
@@ -91,21 +144,22 @@ def signupUpdate():
     name = ""
     git = ""
     gitId = ""
+
     if githubUserInfo is not None:
         pic_url = githubUserInfo['avatar_url']
         name = githubUserInfo['name']
         git = githubUserInfo['html_url']
         gitId = githubUserInfo['login']
 
-        if profile_repository.read_git(git) == git:
-            # git 로 검색해서 있으면 중복 처리
+        # 중복 회원 처리 
+        if profile_repository.read_git_id(git) == git:
             return redirect(f'/signup/fail?message=aleady')
 
     # 입력받은 데이터를 usertable DB에 저장
     usertable = UserTable(
         _id=None,  # MongoDB에서 자동 생성되므로 None으로 설정
         id = id,
-        password = password,
+        nickname = nickname,
         pic_url=pic_url,
         generation=cardinal,
         num=number,

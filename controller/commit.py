@@ -9,19 +9,33 @@ bp = Blueprint('commit', __name__)
 
 @bp.route('/commit/user/list')
 def commitUserList():
-    userCommitCountRepository # 오늘 유저들 가져옴 - 해당 idx로 user repo에서 가져옴 
-    todayCommitUserList = userCommitCountRepository.todayList()
+    userCommitCountRepository  # 오늘 유저들 가져옴 - 해당 idx로 user repo에서 가져옴 
+    try:
+        todayCommitUserList = userCommitCountRepository.todayList()
+    except Exception as e:
+        print(f"Error fetching commit list: {e}")
+        todayCommitUserList = []
+
+    # 확인 로그 출력
+    print(f"Today Commit User List: {todayCommitUserList}")
+    
     userList = profile_repository.read_all_jungler()
+    print(f"User List: {userList}")
+    
     list = []
     for today in todayCommitUserList:
         for user in userList:
-            if user._id == today.userKey:
+            if str(user._id) == str(today.userKey):
                 list.append(
                     {
                         'user': user,
                         'count': today.count
                     }
                 )
+
+    if not list:
+        print("No matching users found in the commit list.")
+
     list.sort(key=lambda item: (-item['count'], item['user'].id))
     result = {
         "userList": [ 
@@ -32,7 +46,9 @@ def commitUserList():
             for item in list
         ]
     }
+    print(f"Final Result: {result}")
     return jsonify(result)
+
 
 @bp.route('/commit/total-count')
 def commitTotalCount():

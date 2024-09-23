@@ -29,10 +29,17 @@
             <span class="text-green-500 text-3xl font-bold">JungleHub</span>
         </div>
 
-        <form action="{{ url_for('signup.signupUpdate', code=code) }}" method="post" enctype="multipart/form-data"
-            onsubmit="return validateForm()" class="space-y-4">
+        <form
+            action="{{ url_for('signup.signupUpdate', code=code, userGitID=userGitID, userGitName=userGitName, userGitPic_url=userGitPic_url) }}"
+            method="post" enctype="multipart/form-data" onsubmit="return validateForm()" class="space-y-4">
+            
+            <input type="hidden" id="userGitPic" name="userGitPic">
+
+            <!-- Profile Picture -->
+            <img id="profilePic" alt="Profile Picture" class="w-56 h-56 rounded-full object-cover mx-auto mb-8">
+
             <!-- ID Input -->
-            <div class="relative mt-4"> <!-- Add margin-top class -->
+            <div class="relative mt-4">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -45,8 +52,8 @@
                     class="w-full py-2 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
-            <!-- Password Input -->
-            <div class="relative mt-4"> <!-- Add margin-top class -->
+            <!-- Nickname Input -->
+            <div class="relative mt-4">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -55,23 +62,12 @@
                         </path>
                     </svg>
                 </span>
-                <input id="password" name="password" type="password" placeholder="비밀번호"
+                <input id="nickname" name="nickname" type="text" placeholder="닉네임"
                     class="w-full py-2 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
-            <!-- Password Confirmation Input -->
-            <div class="relative mt-4"> <!-- Add margin-top class -->
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </span>
-                <input id="password-confirm" name="password-confirm" type="password" placeholder="비밀번호 확인"
-                    class="w-full py-2 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-            </div>
-
-            <div class="relative mt-4"> <!-- Add margin-top class -->
+            <!-- Cardinal Input -->
+            <div class="relative mt-4">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -84,7 +80,8 @@
                     class="w-full py-2 pl-12 pr-3 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
-            <div class="relative mt-4"> <!-- Add margin-top class -->
+            <!-- Number Input -->
+            <div class="relative mt-4">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -104,7 +101,7 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="mt-6"> <!-- Add margin-top class -->
+            <div class="mt-6">
                 <button type="submit"
                     class="w-full py-3 bg-green-500 text-white rounded-full font-bold hover:bg-green-600">회원가입
                     완료</button>
@@ -112,8 +109,36 @@
         </form>
     </div>
 
-    <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
+    <script>
+        // URL 파라미터를 추출하는 함수
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                userGitID: params.get('userGitID'),
+                userGitName: params.get('userGitName'),
+                userGitPic_url: params.get('userGitPic_url')
+            };
+        }
 
+        // 추출된 파라미터 값을 해당 요소에 적용
+        window.onload = function () {
+            const { userGitID, userGitName, userGitPic_url } = getQueryParams();
+
+            // 프로필 사진 적용
+            if (userGitPic_url) {
+                document.getElementById('profilePic').src = userGitPic_url;
+            }
+
+            // 아이디 및 닉네임 기본값 설정
+            if (userGitID) {
+                document.getElementById('id').value = userGitID;
+            }
+
+            if (userGitName) {
+                document.getElementById('nickname').value = userGitName;
+            }
+        };
+    </script>
 
     {% include 'footer.html' %}
 </body>

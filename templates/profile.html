@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JungleHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" type="image.png" href="../static/images/Logo.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <style>
         @font-face {
             font-family: "Orbit-Regular";
@@ -14,74 +18,22 @@
         body {
             font-family: "Orbit-Regular";
         }
-
-        .profile-container {
-            text-align: center;
-            margin-top: 50px;
-            font-family: Arial, sans-serif;
-        }
-
-        .profile-pic {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
-
-        .profile-info {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .profile-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .profile-github {
-            margin-bottom: 15px;
-        }
-
-        .profile-github a {
-            text-decoration: none;
-            color: #0366d6;
-            font-size: 18px;
-        }
-
-        .profile-bio {
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-
-        .profile-contributions {
-            font-size: 18px;
-            font-weight: bold;
-            color: #28a745;
-        }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         window.onload = function () {
             const token = localStorage.getItem('key');
             console.log(token);
-
             loadProfile();
         }
 
-
         function loadProfile() {
-            // 로컬 스토리지에서 accessToken 가져오기
             const token = localStorage.getItem('key');
 
             if (!token) {
                 alert('로그인이 필요합니다.');
                 return;
             }
-            // console(token)
 
-            // 서버로 GET 요청, 헤더에 토큰 포함
             $.ajax({
                 url: '/profile/info',
                 method: 'GET',
@@ -89,23 +41,21 @@
                     'Authorization': 'Bearer ' + token
                 },
                 success: function (user) {
-                    // 프로필 데이터를 페이지에 동적으로 추가
                     $('.profile-container').html(`
-                        <img src="${user.pic_url}" alt="Profile Picture" class="profile-pic">
-                        <div class="profile-info">기수: ${user.generation}기 | 번호: ${user.num}번</div>
-                        <div class="profile-name">${user.name}</div>
-                        <div><span class="like-count">${user.like}</span> <button class="btn" onclick="likeModifi()">좋아요</button></div>
-                        <div class="profile-github">
-                            <a href="${user.git}" target="_blank">GitHub Profile</a>
-                        </div>
-                        <div class="profile-bio">${user.bio}</div>
-                        <div class="profile-contributions" style="visibility: hidden;">누적 기여 수: ${user.commit}</div>
-                        <button class="btn" style="visibility: hidden;" onclick="window.location.href='/profile1/modifi'">수정하기</button>
+                    <img src="${user.pic_url}" alt="Profile Picture" class="w-56 h-56 rounded-full object-cover mx-auto mb-8">
+                    <div class="text-2xl mb-6 text-green-500 sm:text-3xl md:text-4xl">기수: ${user.generation}기 | 번호: ${user.num}번</div>
+                    <div class="text-4xl font-bold mb-10 text-white sm:text-5xl md:text-6xl">${user.name}</div>
+                    <div class="flex justify-center text-green-500 mb-4 font-semibold">
+                        <span class="like-count text-3xl sm:text-4xl mr-5">Likes: ${user.like}</span>
+                        <button class="bg-green-500 text-white py-3 px-5 rounded-lg sm:py-4 sm:px-6 ml-5 text-lg sm:text-xl" onclick="likeModifi()">좋아요</button>
+                    </div>
+                    <div class="mb-6">
+                        <a href="${user.git}" target="_blank" class="hover:underline text-green-500 hover:text-green-400 text-2xl sm:text-3xl">GitHub Profile</a>
+                    </div>
                     `);
                 },
                 error: function (xhr, status, error) {
                     console.error('프로필 정보를 불러오는 중 오류:', error);
-
                 }
             });
         }
@@ -141,12 +91,11 @@
     </script>
 </head>
 
-<body>
-    <div class="profile-container">
-
+<body class="bg-black text-white min-h-screen">
+    {% include 'header.html' %}
+    <div class="profile-container text-center mt-20 mb-20 flex flex-col justify-center items-center">
     </div>
-
-
+    {% include 'footer.html' %}
 </body>
 
 </html>

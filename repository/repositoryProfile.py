@@ -6,7 +6,7 @@ class UserTable:
     def __init__(self, 
                  _id, 
                  id, 
-                 password, 
+                 nickname, 
                  pic_url, 
                  generation, 
                  num, 
@@ -18,7 +18,7 @@ class UserTable:
                  bio=None):
         self._id = _id
         self.id = id
-        self.password = password
+        self.nickname = nickname
         self.pic_url = pic_url
         self.generation = generation
         self.num = num
@@ -61,7 +61,7 @@ class ProfileRepository:
     def create(self, usertable):
         data = {
             "id": usertable.id,
-            "password": usertable.password,
+            "nickname": usertable.nickname,
             "pic_url": usertable.pic_url,
             "generation": usertable.generation,
             "num": usertable.num,
@@ -87,7 +87,7 @@ class ProfileRepository:
             return UserTable(
                 _id=str(result['_id']),
                 id=result['id'],
-                password=result['password'],
+                nickname=result['nickname'],
                 pic_url=result['pic_url'],
                 generation=result['generation'],
                 num=result['num'],
@@ -109,21 +109,23 @@ class ProfileRepository:
         for data in cursor:
             usertable = UserTable(
                 _id=str(data['_id']),
-                id=data['id'],
-                password=data['password'],
-                pic_url=data['pic_url'],
-                generation=data['generation'],
-                num=data['num'],
-                name=data['name'],
-                like=data['like'],
-                git=data['git'],
-                bio=data['bio'],
-                githubaccesstoken=data['githubaccesstoken'],
-                gitId=data['gitId']
+                id=data.get('id', ''),  # 'id' 필드가 없을 경우 빈 문자열을 사용
+                nickname=data.get('nickname', ''),  # 'nickname' 필드가 없을 경우 빈 문자열을 사용
+                pic_url=data.get('pic_url', ''),  # 'pic_url' 필드가 없을 경우 빈 문자열을 사용
+                generation=data.get('generation', 0),  # 'generation' 필드가 없을 경우 기본값 0 사용
+                num=data.get('num', 0),  # 'num' 필드가 없을 경우 기본값 0 사용
+                name=data.get('name', ''),  # 'name' 필드가 없을 경우 빈 문자열 사용
+                like=data.get('like', 0),  # 'like' 필드가 없을 경우 기본값 0 사용
+                git=data.get('git', ''),  # 'git' 필드가 없을 경우 빈 문자열 사용
+                bio=data.get('bio', ''),  # 'bio' 필드가 없을 경우 빈 문자열 사용
+                githubaccesstoken=data.get('githubaccesstoken', ''),  # 'githubaccesstoken' 필드가 없을 경우 빈 문자열 사용
+                gitId=data.get('gitId', '')  # 'gitId' 필드가 없을 경우 빈 문자열 사용
             )
             junglerList.append(usertable)
+            #print(junglerList)
 
         return junglerList
+
 
     # _id를 기반으로 유저 테이블 정보를 읽어오는 함수
     def read_all(self, user_id):
@@ -132,7 +134,7 @@ class ProfileRepository:
         #     usertable = UserTable(
         #         _id=data['_id'],
         #         id=data['id'],
-        #         password=data['password'],
+        #         nickname=(data['nickname'], ''),
         #         pic_url=data['pic_url'],
         #         generation=data['generation'],
         #         num=data['num'],
@@ -153,10 +155,10 @@ class ProfileRepository:
             return data['bio']
         return None
     
-    def read_git(self, git):
-        data = self.collection.find_one({ 'git': git })
+    def read_git_id(self, gitId):
+        data = self.collection.find_one({ 'gitId': gitId })
         if data:
-            return data['git']
+            return data['gitId']
         return None
     
     def read_git_user(self, git):
@@ -204,10 +206,12 @@ class ProfileRepository:
             return result
         return None
     
-     # 모든 유저의 정보를 삭제하는 함수
-    def delete_all_users(self):
-        result = self.collection.delete_many({})
-        return result.deleted_count  # 삭제된 문서 수 반환
+    def delete(self, _id):
+        if isinstance(_id) is not ObjectId:
+            _id = ObjectId(_id)
+        self.collection.delete_one(
+            { '_id': _id }
+        )
 
 profile_repository = ProfileRepository(client)
 
@@ -234,6 +238,13 @@ class TokenRepository:
         self.client = client
         self.db = client['dbjungle']
         self.collection = self.db['token']
+
+    def delete(self, _id):
+        if isinstance(_id) is not ObjectId:
+            _id = ObjectId(_id)
+        self.collection.delete_one(
+            { '_id': _id }
+        )
 
     # 새 유저 테이블 생성 함수
     def create(self, tokentable):
@@ -285,7 +296,6 @@ class TokenRepository:
             junglerList.append(tokentable)
 
         return junglerList
-
 
 
     # 데이터베이스의 모든 유저의 _id, accesstoken 알아오는 함수
