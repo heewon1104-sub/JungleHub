@@ -5,7 +5,6 @@ from repository.boardBlockListRepository import boardBlockListRepository
 from module.githubApi import GithubApi
 from module.scheduler import Scheduler
 from model.dayTotalCommitCount import DayTotalCommitCount
-from model.userCommitCount import UserCommitCount
 from model.boardBlockList import BoardBlockList
 import random
 
@@ -59,7 +58,7 @@ class CommitCountScheduler:
         userCommitCountRepository.updateAllUserCount(resultList)
 
 
-        # TODO: board block list 로직 추가
+        # board block list 로직
 
         allIndices = []
         for i in range(0,35):
@@ -73,7 +72,6 @@ class CommitCountScheduler:
             openRate = 1
 
         openCount = int(totalBlockCount * openRate)
-        # blockedCount = totalBlockCount - openCount
 
         lastBlock = boardBlockListRepository.todayOpenList()
 

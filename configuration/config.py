@@ -6,7 +6,11 @@ class Config:
     root = tree.getroot()
 
     def find(self, key): 
-        return self.root.find(f"string[@name='{key}']").text
+        try:
+            result = self.root.find(f"string[@name='{key}']")
+            return result.text
+        except:
+            return None
     
     def getHost(self):
         if self.isDev():
