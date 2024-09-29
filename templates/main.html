@@ -97,10 +97,14 @@
 
 <body class="bg-black text-white">
 
+
+    {% if clientInfo != null %}
     {% include 'header.html' %}
+    {% else %}
+    {% include 'loginedHeader.html' %}
+    {% endif %}
 
     <input id="token" value="{{ clientInfo }}" hidden>
-
     <div class="w-full mx-auto py-8">
         <div class="section-1 flex justify-center items-center border-gray-500 w-screen h-screen pb-20"
             style="border-bottom-width: 1px;">
@@ -118,12 +122,13 @@
             <span class="flex justify-center items-center h-[100px] text-black" style="font-size: 4em;">누적
                 커밋수</span>
             <div class="flex flex-row items-end">
-                <span id="animation-commit" class="text-green-500" style="font-size: 9em;" hidden></span>
-                <span id="animation-commit" class="ml-5 mb-5 text-green-500" style="font-size: 4em;">commits</span>
+                <span id="animation-commit" class="text-green-500" style="font-size: 9em;">{{totalCount}}</span>
+                <span class="ml-5 mb-5 text-green-500" style="font-size: 4em;">commits</span>
             </div>
         </div>
 
         <div class="section-3">
+            <span id='openList' hidden>{{openList}}</span>
             <h1 id="day-display" class="text-center text-3xl text-green-500 font-bold"
                 style="font-size: 4em; margin-bottom: 50px; margin-top: 50px;">
             </h1>
@@ -135,16 +140,19 @@
             </div>
 
             <div class="mt-8 text-center px-20 mx-20 mt-20 mb-20">
-                <h1 class="text-3xl mb-4 font-bold">기여한 개발자들</h1>
+                <h1 class="text-3xl mb-4 font-bold">오늘 기여한 개발자들</h1>
                 <div class="py-5">
-                    <div id="contributors" class="flex flex-wrap gap-x-10 gap-y-6 text-xl font-extrabold">
-                        <!-- JavaScript will populate this area -->
+                    <div id="contributors" class="flex flex-wrap gap-x-10 gap-y-6 text-xl font-extrabold ">
+                        {% if users %}
+                        {% for user in users %}
+                        <span class="text-green-500">{{user.name}}</span>
+                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {% include 'footer.html' %}
+        {% include 'footer.html' %}
 
-</html>
+</body>

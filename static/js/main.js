@@ -1,14 +1,6 @@
 // 전역 변수로 선언하여 화면 너비의 50% 값을 저장
 var screenWidth80Percent = window.innerWidth * 0.5;
 
-// 숨기고자 하는 타일 ID를 지정하는 배열 (초기 값은 빈 배열)
-var list = [];
-
-// 전역 변수 선언
-var user_list = [];
-
-let totalCount = 0;
-
 let isFirstAnimationPlaying = false;
 
 function createObserver() {
@@ -90,18 +82,17 @@ function showSecondText() {
   startSecondAnimation();
 }
 
-// 커밋 애니메이션 함수
 function commitAnimation() {
   let countBox = document.querySelector('#animation-commit');
   let count = 0;
-  let num = totalCount;
+  let num = parseInt(countBox.textContent); // 템플릿에서 받은 커밋 수를 가져옴
 
   let counting = setInterval(function () {
     if (count >= num) {
       count = num;
       clearInterval(counting);
     } else {
-      count += 1;
+      count += Math.ceil(num / 40); // 조금씩 커밋 수 증가
     }
     countBox.innerHTML = new Intl.NumberFormat().format(count);
   }, 10);
@@ -137,14 +128,9 @@ function formatDate(date) {
   return `${month}/${day}`;
 }
 
-// 타일 초기화 함수
-async function initializeTiles() {
+// 타일 초기화 함수 (API 없이 애니메이션만 처리)
+function TilesAnimation() {
   try {
-    // 서버로부터 숨길 타일 인덱스를 가져옴
-    const response = await fetch('/commit/board/open/list');
-    const data = await response.json();
-    list = data.indices; // 서버에서 받은 인덱스를 list에 저장
-
     // 타일 컨테이너 가져오기
     const tileContainer = document.getElementById('tile-container');
 
@@ -156,6 +142,9 @@ async function initializeTiles() {
     tempImage.src = 'https://picsum.photos/500';
 
     tempImage.onload = function () {
+      // 숨기고자 하는 타일 ID를 지정하는 배열
+      var list = JSON.parse(document.getElementById('openList').textContent);
+      console.log('Tile: ', list);
       // 이미지 로드가 완료된 후에 해상도를 사용하여 높이를 계산
       const imageWidth = this.naturalWidth;
       const imageHeight = this.naturalHeight;
@@ -165,6 +154,7 @@ async function initializeTiles() {
       const containerHeight = screenWidth80Percent * imageAspectRatio;
       tileContainer.style.height = containerHeight + 'px';
 
+      // 타일 초기화 및 애니메이션 처리
       for (let i = 0; i <= 34; i++) {
         const tileContainerElement = document.createElement('div');
 
@@ -216,81 +206,13 @@ async function initializeTiles() {
   }
 }
 
-// Function to update header links based on the token
-function updateHeaderLinks() {
-  const authLinksContainer = document.getElementById('auth-links');
-  const token = localStorage.getItem('key');
-
-  if (token === 'null' || token === null) {
-    authLinksContainer.innerHTML = `
-      <a href="/signup/redirect" class="text-green-500 hover:underline font-bold text-lg">기여하기</a>
-    `;
-  } else {
-    authLinksContainer.innerHTML = `
-      <a href="/profile" class="text-green-500 hover:underline font-bold text-lg">프로필</a>
-    `;
-  }
-}
-
-const fetchUserList = async () => {
-  try {
-    const response = await fetch('/commit/user/list'); // fetch 요청을 보내고 응답을 기다림
-    const data = await response.json(); // 응답을 JSON 형태로 파싱하고 결과를 기다림
-
-    if (data && data.userList) {
-      user_list = data.userList; // 서버로부터 받은 userList로 업데이트
-
-      console.log(user_list);
-
-      // 기여자 목록을 표시할 컨테이너 요소 선택
-      const contributorsContainer = document.getElementById('contributors');
-
-      // 반복문을 통해 기여자 요소 생성 및 추가
-      user_list.forEach((user) => {
-        const span = document.createElement('span');
-        span.className = 'text-green-500';
-        span.textContent = user.name;
-        console.log(user);
-        console.log(user._id);
-        contributorsContainer.appendChild(span);
-      });
-    }
-  } catch (error) {
-    console.error('Error fetching user list:', error);
-  }
-};
-
-const commitCount = async () => {
-  try {
-    const response = await fetch('/commit/total-count'); // fetch 요청을 보내고 응답을 기다림
-    const data = await response.json(); // 응답을 JSON 형태로 파싱하고 결과를 기다림
-
-    totalCount = data.commitTotalCount; // 서버로부터 받은 commitTotalCount로 업데이트
-  } catch (error) {
-    console.error('Error fetching total commit count:', error);
-  }
-};
-
 // 페이지 로드 시 필요한 모든 초기화 작업 수행
 window.onload = async function () {
   // localStorage.setItem('key', null);
-
   createObserver();
-
-  // Fetch commit count before animation
-  await commitCount();
-
-  // 시작 애니메이션 실행
-  commitAnimation();
 
   // 날짜 계산
   document.getElementById('day-display').innerText = calculateDay();
-
-  // Initialize tiles after DOM is loaded
-  await initializeTiles(); // 비동기로 타일 초기화
-
-  // Fetch user list and update UI accordingly
-  await fetchUserList();
 
   //토큰 로직
   let tokenElement = document.getElementById('token');
@@ -308,8 +230,7 @@ window.onload = async function () {
 
   console.log('Bearer ' + localStorage.getItem('key'));
 
-  // Call function to update header links based on the token
-  updateHeaderLinks();
+  TilesAnimation();
 };
 
 // 스크롤 이벤트 처리
