@@ -25,8 +25,6 @@ def signout():
     if not access_token:
         return "Access token is missing or invalid", 400
     token = access_token.split("Bearer ")[-1]
-    
-    print(token)
 
     accesstokenList = token_repository.read_all_accesstoken()
 
@@ -107,9 +105,24 @@ def signupComplete():
 
 @bp.route("/signup", methods=['GET'])
 def signup():
-    # 사용자가 처음으로 접근하면 GitHub 로그인 페이지로 리다이렉트
+    # # 로그인 여부 확인
+    # if 'Authorization' in request.headers:
+    #     token = request.headers['Authorization'].split('Bearer ')[-1]
+    #     try:
+    #         config = Config()
+    #         secret_key = config.find("MY_SECRET_KEY")
+    #         jwt.decode(token, secret_key, algorithms=["HS256"])
+    #         # 토큰이 유효하면 리다이렉트
+    #         return redirect('/main')
+    #     except jwt.ExpiredSignatureError:
+    #         # 토큰이 만료되었으면 새로 로그인 필요
+    #         return redirect('/signup')
+    #     except jwt.InvalidTokenError:
+    #         # 유효하지 않은 토큰
+    #         pass
+
+    # GitHub 로그인 페이지로 리다이렉트
     code = request.args.get('code')
-    print(code)
 
     githubId = request.args.get('userGitID')
     githubNickname = request.args.get('userGitName')
@@ -124,13 +137,12 @@ def signup():
         picEmail=picEmail, 
         githubEmail= githubEmail
     )
-        
+
 @bp.route("/signup/update", methods=['POST'])
 def signupUpdate():
   
     code = request.args.get('code')
     github_access_token = inMemoryCacheInstance.get(code)
-    print(code)
 
     id = request.form['id']
     nickname = request.form['nickname']
@@ -172,7 +184,7 @@ def signupUpdate():
     )
     created_user = profile_repository.create(usertable) 
     user_id = created_user._id
-    print("생성된 유저의 _id: {user_id}")
+    # print("생성된 유저의 _id: {user_id}")
  
     # jwt 토큰 발급
     payload = {"userId": user_id}
@@ -192,7 +204,7 @@ def signupUpdate():
         createdat = datetime.now()
     )
     created_token = token_repository.create(tokentable) 
-    print("생성된 유저의 userId: {created_token.userId}")    
+    # print("생성된 유저의 userId: {created_token.userId}")    
 
     # count batch refresh 
     CommitCountScheduler().job()

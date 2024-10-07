@@ -13,7 +13,6 @@ SECRET_KEY = "MY_SECRET_KEY"  # JWT 토큰을 검증할 시크릿 키
 def profile():
   # 요청 헤더에서 Authorization 헤더로 accessToken 가져오기
     access_token = request.headers.get('Authorization')
-    print(access_token)
 
     if not access_token:
         return "Access token is missing or invalid", 400
@@ -21,7 +20,6 @@ def profile():
 
     # "Bearer " 부분 제거하고 토큰만 추출
     token = access_token.split("Bearer ")[-1]
-    print(token)
 
     accesstokenList = token_repository.read_all_accesstoken()
 
@@ -129,7 +127,6 @@ def update_like():
 
     # 요청 헤더에서 Authorization 헤더로 accessToken 가져오기
     access_token = request.headers.get('Authorization')
-    print(access_token)
 
     if not access_token:
         return "Access token is missing or invalid", 400
@@ -137,7 +134,6 @@ def update_like():
 
     # "Bearer " 부분 제거하고 토큰만 추출
     token = access_token.split("Bearer ")[-1]
-    print(token)
 
 
 
