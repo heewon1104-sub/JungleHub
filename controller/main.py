@@ -69,4 +69,4 @@ def main():
     if clientInfo is not None:
         return render_template('main.html', clientInfo=clientInfo, users=result['userList'], openList=result['openListIndices'], totalCount=result['commitTotalCount'])
     else:
-        return render_template('main.html', users=result['userList'], openList=result['openListIndices'],totalCount=result['commitTotalCount'])
+        return render_template('main.html', clientInfo=None, users=result['userList'], openList=result['openListIndices'],totalCount=result['commitTotalCount'])
