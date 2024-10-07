@@ -213,18 +213,25 @@ window.onload = async function () {
   // 날짜 계산
   document.getElementById('day-display').innerText = calculateDay();
 
-  //토큰 로직
+  // 토큰 로직
   let tokenElement = document.getElementById('token');
-  let tokenValue = tokenElement.value;
+  let tokenValue = tokenElement ? tokenElement.value : '';
 
   if (tokenValue == '' || tokenValue == null) {
-    if (localStorage.getItem('key') == null) {
-      localStorage.setItem('key', null);
-    }
+    localStorage.setItem('key', ''); // 기존에 null 대신 빈 문자열 저장
   } else {
-    let changedToken = tokenValue.replace(/'/g, `"`);
-    let tokenObject = JSON.parse(changedToken);
-    localStorage.setItem('key', tokenObject.access_token);
+    let changedToken = tokenValue.replace(/'/g, `"`).replace(/None/g, 'null'); // None을 null로 변경
+    try {
+      let tokenObject = JSON.parse(changedToken);
+      if (tokenObject && tokenObject.access_token) {
+        localStorage.setItem('key', tokenObject.access_token);
+      } else {
+        localStorage.setItem('key', ''); // access_token이 없는 경우 빈 문자열로 설정
+      }
+    } catch (e) {
+      console.error('JSON parsing error:', e);
+      localStorage.setItem('key', ''); // 파싱 오류 발생 시 빈 문자열로 설정
+    }
   }
 
   TilesAnimation();
