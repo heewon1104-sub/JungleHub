@@ -22,7 +22,7 @@ class UserCommitCountRepository:
         for data in self.collection.find():
             item = UserCommitCount.from_dict(data)
             list.append(item)
-        return list;
+        return list
 
     def todayList(self):
         current = datetime.now(timezone(timedelta(hours=9-6)))

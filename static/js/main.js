@@ -144,7 +144,6 @@ function TilesAnimation() {
     tempImage.onload = function () {
       // 숨기고자 하는 타일 ID를 지정하는 배열
       var list = JSON.parse(document.getElementById('openList').textContent);
-      console.log('Tile: ', list);
       // 이미지 로드가 완료된 후에 해상도를 사용하여 높이를 계산
       const imageWidth = this.naturalWidth;
       const imageHeight = this.naturalHeight;
@@ -234,8 +233,6 @@ window.onload = async function () {
       localStorage.setItem('key', ''); // 파싱 오류 발생 시 빈 문자열로 설정
     }
   }
-
-  console.log('Bearer ' + localStorage.getItem('key'));
 
   TilesAnimation();
 };

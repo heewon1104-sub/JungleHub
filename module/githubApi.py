@@ -100,8 +100,6 @@ class GithubApi:
         
         response = requests.post(self.graphqlUrl, headers=headers, data=data)
 
-        print(response.status_code)
-
         # 결과 출력
         if response.status_code == 200:
             result = response.json()  # 응답을 JSON으로 파싱

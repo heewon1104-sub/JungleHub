@@ -22,7 +22,6 @@
     <script>
         window.onload = function () {
             const token = localStorage.getItem('key');
-            console.log(token);
             loadProfile();
         }
 
@@ -79,7 +78,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    document.querySelector('.like-count').innerText = result;
+                    document.querySelector('.like-count').innerText = 'Likes: ' + result;
                 } else {
                     alert('좋아요 실패했습니다.');
                 }

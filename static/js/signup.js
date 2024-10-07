@@ -14,8 +14,6 @@ function validateForm() {
 function validate(id, nickname, cardinal, number) {
   var space = /\s/g;
 
-  console.log(id, nickname, cardinal, number);
-
   // 공백 검사
   if (id === '') {
     alert('아이디를 입력해주세요!');
@@ -51,6 +49,17 @@ function validate(id, nickname, cardinal, number) {
     alert('번호에 공백이 포함되어 있습니다.');
     return false;
   }
+
+  // 기수와 번호 범위 검사
+  if (parseInt(cardinal) > 20) {
+    alert('기수 입력이 올바르지 않습니다');
+    return false;
+  }
+  if (parseInt(number) > 60) {
+    alert('번호는 입력이 올바르지 않습니다');
+    return false;
+  }
+
   // 모든 검사 통과
   alert('회원가입이 완료되었습니다!');
   return true;
