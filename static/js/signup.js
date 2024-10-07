@@ -14,7 +14,6 @@ function validateForm() {
 function validate(id, nickname, cardinal, number) {
   var space = /\s/g;
 
-  console.log(id, nickname, cardinal, number);
   // 공백 검사
   if (id === '') {
     alert('아이디를 입력해주세요!');
