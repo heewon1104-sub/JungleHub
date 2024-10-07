@@ -116,6 +116,10 @@ def signup():
     picEmail = request.args.get('userGitPicURL')
     githubEmail = request.args.get('userGitURL')
 
+    # signup으로 바로 접근한 경우
+    if None in (code, githubId, githubNickname, githubEmail):
+        return redirect(f'/main')
+
     return render_template(
         'signup.html',
         code=code, 
