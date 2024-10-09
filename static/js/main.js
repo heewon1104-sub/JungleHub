@@ -14,9 +14,14 @@ function createObserver() {
 
   observer = new IntersectionObserver(handleIntersect, options);
 
-  observer.observe(document.querySelector('#animation-text')); // 첫 번째 텍스트 애니메이션 요소 관찰
-  observer.observe(document.querySelector('#wave')); // 두 번째 텍스트 애니메이션 요소 관찰
-  observer.observe(document.querySelector('.section-2')); // 섹션 2 관찰
+  // 요소가 존재하는지 확인하고 옵저버로 감시
+  const animationText = document.querySelector('#animation-text');
+  const wave = document.querySelector('#wave');
+  const section2 = document.querySelector('.section-2');
+
+  if (animationText) observer.observe(animationText); // 첫 번째 텍스트 애니메이션 요소 관찰
+  if (wave) observer.observe(wave); // 두 번째 텍스트 애니메이션 요소 관찰
+  if (section2) observer.observe(section2); // 섹션 2 관찰
 }
 
 function handleIntersect(entries, observer) {
@@ -67,10 +72,10 @@ function startSecondAnimation() {
   wave.innerHTML = wave.textContent
     .split('')
     .map((letter, idx) => {
-      if (letter === ' ') return ' ';
+      if (letter === ' ') return ' '; // 공백은 그대로 반환
       return `<span style="animation-delay:${
         idx * 15
-      }ms" class="letter">${letter}</span>`;
+      }ms" class="letter">${letter}</span>`; // 문자열 템플릿으로 HTML 생성
     })
     .join('');
 }
@@ -118,7 +123,7 @@ function calculateDay() {
   const periodStart = new Date(now);
   const periodText = `${formatDate(periodStart)}`;
 
-  return `${periodText}(Day${dayNumber})`;
+  return `${periodText} (Day ${dayNumber})`;
 }
 
 // 날짜 형식을 'MM/DD'로 변환하는 함수
@@ -158,8 +163,7 @@ function TilesAnimation() {
         const tileContainerElement = document.createElement('div');
 
         if (list.includes(i)) {
-          // list에 있는 ID를 가진 타일은 투명하게 하고 플립 애니메이션 적용
-          tileContainerElement.className = 'flip-container';
+          tileContainerElement.className = 'flip-container'; // list에 있는 타일에 애니메이션 적용
 
           const tile = document.createElement('div');
           tile.style = 'position: relative; width: 100%; height: 100%;';
@@ -176,7 +180,6 @@ function TilesAnimation() {
           tile.appendChild(back);
           tileContainerElement.appendChild(tile);
 
-          // 옵저버로 타일이 보일 때만 애니메이션 실행
           const observer = new IntersectionObserver(
             (entries) => {
               entries.forEach((entry) => {
@@ -193,8 +196,7 @@ function TilesAnimation() {
 
           observer.observe(tileContainerElement);
         } else {
-          // list에 없는 ID를 가진 타일은 초록색 타일로 설정하여 가림
-          tileContainerElement.className = 'tile bg-green-500 rounded-lg';
+          tileContainerElement.className = 'tile bg-green-500 rounded-lg'; // list에 없는 타일은 초록색
         }
 
         tileContainer.appendChild(tileContainerElement);
@@ -205,89 +207,34 @@ function TilesAnimation() {
   }
 }
 
-// 페이지 로드 시 필요한 모든 초기화 작업 수행
-window.onload = async function () {
-  // localStorage.setItem('key', null);
+document.addEventListener('DOMContentLoaded', function () {
   createObserver();
 
   // 날짜 계산
   document.getElementById('day-display').innerText = calculateDay();
 
+  // 타일 애니메이션 실행
+  TilesAnimation();
+
   // 토큰 로직
   let tokenElement = document.getElementById('token');
   let tokenValue = tokenElement ? tokenElement.value : '';
 
-  if (tokenValue == '' || tokenValue == null) {
-    localStorage.setItem('key', ''); // 기존에 null 대신 빈 문자열 저장
+  // 이전 로컬 스토리지에 저장된 토큰 값 가져오기
+  let existingToken = localStorage.getItem('key');
+
+  // 새로운 토큰 값이 빈 문자열이거나 유효하지 않으면 기존 토큰을 유지
+  if (tokenValue === '' || tokenValue === null) {
   } else {
-    let changedToken = tokenValue.replace(/'/g, `"`).replace(/None/g, 'null'); // None을 null로 변경
+    let changedToken = tokenValue.replace(/'/g, '"').replace(/None/g, 'null');
     try {
       let tokenObject = JSON.parse(changedToken);
+
       if (tokenObject && tokenObject.access_token) {
         localStorage.setItem('key', tokenObject.access_token);
-      } else {
-        localStorage.setItem('key', ''); // access_token이 없는 경우 빈 문자열로 설정
       }
     } catch (e) {
-      console.error('JSON parsing error:', e);
-      localStorage.setItem('key', ''); // 파싱 오류 발생 시 빈 문자열로 설정
+      console.error('JSON 파싱 오류 발생:', e);
     }
   }
-
-  TilesAnimation();
-};
-
-// 스크롤 이벤트 처리
-$(window)
-  .scroll(function () {
-    var scrollTop = $(window).scrollTop();
-    var section1Height = $('.section-1').outerHeight();
-    var section2 = $('.section-2');
-
-    if (section2.length) {
-      var section2Top = section2.offset().top;
-      var windowHeight = $(window).height();
-
-      // 색상 보간 함수
-      function interpolateColor(color1, color2, factor) {
-        var result = color1.slice();
-        for (var i = 0; i < 3; i++) {
-          result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
-        }
-        return result;
-      }
-
-      // RGB 값을 CSS rgb 문자열로 변환
-      function rgbToCSS(rgb) {
-        return 'rgb(' + rgb.join(',') + ')';
-      }
-
-      // 색상 정의
-      var color1 = [0, 0, 0];
-      var color2 = [255, 255, 255];
-
-      if (scrollTop < section1Height - windowHeight / 10) {
-        // 첫 번째 섹션이 보일 때
-        $('body').css('background-color', rgbToCSS(color1));
-      } else if (
-        scrollTop >= section1Height - windowHeight / 10 &&
-        scrollTop < section2Top + section2.outerHeight() - windowHeight / 10
-      ) {
-        // 두 번째 섹션이 보일 때 (부드러운 전환)
-        var factor =
-          (scrollTop - (section1Height - windowHeight / 10)) /
-          (section2Top - (section1Height - windowHeight / 10));
-        var interpolatedColor = interpolateColor(color1, color2, factor);
-        $('body').css('background-color', rgbToCSS(interpolatedColor));
-      } else {
-        // 세 번째 섹션이 보일 때 (부드러운 전환)
-        var section3Start =
-          section2Top + section2.outerHeight() - windowHeight / 4; // 높이를 약간 더 위로 조정
-        var factor = (scrollTop - section3Start) / (windowHeight / 2); // 마지막 섹션으로 스크롤 시 보간
-        factor = Math.min(1, Math.max(0, factor)); // 0과 1 사이로 제한
-        var interpolatedColor = interpolateColor(color2, color1, factor);
-        $('body').css('background-color', rgbToCSS(interpolatedColor));
-      }
-    }
-  })
-  .scroll();
+});
