@@ -3,8 +3,8 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - test
-      # - main  # main 브랜치에 push될 때 실행
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
