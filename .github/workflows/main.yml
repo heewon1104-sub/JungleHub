@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - test
+      # - main  # main 브랜치에 push될 때 실행
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install SSH client
+      run: sudo apt-get install -y openssh-client
+
+    - name: Connect to EC2 and run script
+      env:
+        SSH_HOST: ${{ secrets.AWS_SSH_HOST }}
+        SSH_USER: ${{ secrets.AWS_SSH_USER }}
+        SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+      run: |
+        echo "${SSH_PRIVATE_KEY}" > private_key.pem
+        chmod 600 private_key.pem
+        ssh -o StrictHostKeyChecking=no -i private_key.pem $SSH_USER@$SSH_HOST 'bash -s' < ~/run_junglehub.sh
