@@ -96,12 +96,8 @@
 
 
 <body class="bg-black text-white">
-  
-    {% if clientInfo == None %}
-    {% include 'header.html' %}
-    {% else %}
+
     {% include 'loginedHeader.html' %}
-    {% endif %}
 
     <input id="token" value="{{ clientInfo }}" hidden>
     <div class="w-full mx-auto py-8">
