@@ -2,8 +2,6 @@
 
 [![Watch the video](https://github.com/user-attachments/assets/0bd7fdab-e87d-4e7b-842b-c04f2ad3f87e)](https://drive.google.com/file/d/1hirCdfClBl7u8Jx9jEuWAWmjWNXqcIAL/view?usp=sharing)
 
-- 배포 URL: http://junglehub.net/main
-
 ## 프로젝트 소개
 
 - JungleHub는 개발자들의 커밋 현황을 시각적으로 표현하는 플랫폼입니다.
